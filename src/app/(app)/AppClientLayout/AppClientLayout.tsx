@@ -1,0 +1,45 @@
+"use client";
+import { DesktopSidebar } from "@/app/(app)/AppClientLayout/Sidebar";
+import {
+  DesktopTopbar,
+  MobileTopbar,
+} from "@/app/(app)/AppClientLayout/Topbar";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import { alpha } from "@mui/material/styles";
+import { AppClientLayoutProps } from "./props";
+
+const AppClientLayout = (props: AppClientLayoutProps) => {
+  const { children } = props;
+  return (
+    <Stack direction="row">
+      <DesktopSidebar />
+      <MobileTopbar />
+      <Box
+        component="main"
+        sx={(theme) => ({
+          flexGrow: 1,
+          backgroundColor: theme.vars
+            ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+            : alpha(theme.palette.background.default, 1),
+          overflow: "auto",
+        })}
+      >
+        <Stack
+          spacing={2}
+          sx={{
+            alignItems: "center",
+            mx: 3,
+            pb: 5,
+            mt: { xs: 8, md: 0 },
+          }}
+        >
+          <DesktopTopbar />
+          {children}
+        </Stack>
+      </Box>
+    </Stack>
+  );
+};
+
+export default AppClientLayout;
