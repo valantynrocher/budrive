@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/utils/supabase/server";
+import { supabase } from "@/utils/supabase/server";
 import { Tables } from "@/utils/supabase/types/database";
 import { formatRegistration } from "@/utils/fp/vehicles";
 
@@ -13,7 +13,7 @@ export async function GET(): Promise<
     data: vehicles,
     error,
     status,
-  } = await supabaseAdmin.from("vehicles").select("*");
+  } = await supabase.from("vehicles").select("*");
 
   if (error)
     return NextResponse.json(
