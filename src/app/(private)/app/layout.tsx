@@ -1,4 +1,4 @@
-import AppClientLayout from "@/app/(app)/AppClientLayout";
+import AppClientLayout from "@/app/(private)/app/AppClientLayout";
 import { supabase } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -15,7 +15,7 @@ const AppLayout = async (props: AppLayoutProps) => {
   });
 
   if (error || !data?.user) {
-    redirect("/sign-in");
+    redirect("/auth/sign-in");
   }
 
   return <AppClientLayout>{children}</AppClientLayout>;

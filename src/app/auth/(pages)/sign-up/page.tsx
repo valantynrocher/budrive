@@ -160,7 +160,7 @@ const SignUpPage = () => {
         </Button>
         <Typography sx={{ textAlign: "center" }}>
           Déjà inscrit ?{" "}
-          <Link href="/sign-in" style={{ alignSelf: "center" }}>
+          <Link href="/auth/sign-in" style={{ alignSelf: "center" }}>
             Se connecter
           </Link>
         </Typography>

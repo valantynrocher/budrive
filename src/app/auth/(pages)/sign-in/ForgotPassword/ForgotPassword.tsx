@@ -1,4 +1,4 @@
-import { ForgotPasswordProps } from "@/app/(auth)/(pages)/sign-in/ForgotPassword/props";
+import { ForgotPasswordProps } from "@/app/auth/(pages)/sign-in/ForgotPassword/props";
 import React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";

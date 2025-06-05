@@ -1,6 +1,6 @@
 "use client";
-import EmailFormControl from "@/app/(auth)/(components)/EmailFormControl";
-import PasswordFormControl from "@/app/(auth)/(components)/PasswordFormControl/PasswordFormControl";
+import EmailFormControl from "@/app/auth/(components)/EmailFormControl";
+import PasswordFormControl from "@/app/auth/(components)/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ErrorSnackbar";
 import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";
@@ -67,7 +67,7 @@ const SignInForm = () => {
       setAuthErrorMessage(translateAuthErrorCode(authError.code));
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      router.push("/app/dashboard");
     }
   };
 

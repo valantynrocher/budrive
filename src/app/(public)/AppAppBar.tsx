@@ -103,7 +103,7 @@ export default function AppAppBar() {
                   textDecoration: "none",
                   color: "inherit",
                 }}
-                href="/sign-in"
+                href="/auth/sign-in"
               >
                 Sign in
               </Link>
@@ -114,7 +114,7 @@ export default function AppAppBar() {
                   textDecoration: "none",
                   color: "inherit",
                 }}
-                href="/sign-up"
+                href="/auth/sign-up"
               >
                 Sign up
               </Link>
@@ -157,12 +157,12 @@ export default function AppAppBar() {
                 <Divider sx={{ my: 3 }} />
                 <MenuItem>
                   <Button color="primary" variant="contained" fullWidth>
-                    <Link href="/sign-up">Sign up</Link>
+                    <Link href="/auth/sign-up">Sign up</Link>
                   </Button>
                 </MenuItem>
                 <MenuItem>
                   <Button color="primary" variant="outlined" fullWidth>
-                    <Link href="/sign-in">Sign in</Link>
+                    <Link href="/auth/sign-in">Sign in</Link>
                   </Button>
                 </MenuItem>
               </Box>

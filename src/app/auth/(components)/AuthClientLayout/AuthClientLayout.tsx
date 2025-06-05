@@ -2,7 +2,7 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import { useTheme } from "@mui/material";
-import { AuthClientLayoutProps } from "@/app/(auth)/(components)/AuthClientLayout/props";
+import { AuthClientLayoutProps } from "@/app/auth/(components)/AuthClientLayout/props";
 import BudriveIcon from "@/components/BudriveIcon";
 import Card from "@mui/material/Card";
 import Link from "next/link";
