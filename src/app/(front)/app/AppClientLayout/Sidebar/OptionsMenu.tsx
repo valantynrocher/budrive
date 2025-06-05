@@ -1,3 +1,4 @@
+import MenuButton from "@/components/MenuButton";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import Divider, { dividerClasses } from "@mui/material/Divider";
@@ -7,11 +8,10 @@ import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { paperClasses } from "@mui/material/Paper";
-import * as React from "react";
-import MenuButton from "../components/MenuButton";
+import React, { useState } from "react";
 
 export default function OptionsMenu() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

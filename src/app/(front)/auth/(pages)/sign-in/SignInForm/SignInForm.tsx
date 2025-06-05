@@ -1,6 +1,6 @@
 "use client";
-import EmailFormControl from "@/app/(front)/auth/(components)/EmailFormControl";
-import PasswordFormControl from "@/app/(front)/auth/(components)/PasswordFormControl/PasswordFormControl";
+import EmailFormControl from "@/app/(front)/auth/EmailFormControl";
+import PasswordFormControl from "@/app/(front)/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ErrorSnackbar";
 import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";

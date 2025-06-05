@@ -1,8 +1,7 @@
-import * as React from "react";
-import Typography from "@mui/material/Typography";
-import Breadcrumbs, { breadcrumbsClasses } from "@mui/material/Breadcrumbs";
 import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
 import { useTheme } from "@mui/material";
+import Breadcrumbs, { breadcrumbsClasses } from "@mui/material/Breadcrumbs";
+import Typography from "@mui/material/Typography";
 
 export default function NavbarBreadcrumbs() {
   const theme = useTheme();

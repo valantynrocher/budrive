@@ -1,12 +1,9 @@
 import AppClientLayout from "@/app/(front)/app/AppClientLayout";
 import { supabase } from "@/utils/supabase/server";
+import { LayoutProps } from "@/utils/types/props";
 import { redirect } from "next/navigation";
 
-type AppLayoutProps = Readonly<{
-  children: React.ReactNode;
-}>;
-
-const AppLayout = async (props: AppLayoutProps) => {
+const AppLayout = async (props: LayoutProps) => {
   const { children } = props;
   const { data, error } = await supabase.auth.getUser();
   console.log("AppLayout", {

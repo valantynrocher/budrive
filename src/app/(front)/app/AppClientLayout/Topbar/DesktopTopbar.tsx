@@ -1,5 +1,5 @@
+import ColorModeIconDropdown from "@/components/ColorModeIconDropdown";
 import Stack from "@mui/material/Stack";
-import ColorModeIconDropdown from "../../../../../components/ColorModeIconDropdown";
 import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
 
 const DesktopTopbar = () => {

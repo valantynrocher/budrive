@@ -14,10 +14,10 @@ import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Link from "next/link";
-import * as React from "react";
+import { useState } from "react";
 
 export default function AppAppBar() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const theme = useTheme();
 
   const toggleDrawer = (newOpen: boolean) => () => {

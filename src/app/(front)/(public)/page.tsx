@@ -6,20 +6,6 @@ export default function MarketingPage() {
     <>
       <AppAppBar />
       <Hero />
-      {/* <div>
-        <LogoCollection />
-        <Features />
-        <Divider />
-        <Testimonials />
-        <Divider />
-        <Highlights />
-        <Divider />
-        <Pricing />
-        <Divider />
-        <FAQ />
-        <Divider />
-        <Footer />
-      </div> */}
     </>
   );
 }

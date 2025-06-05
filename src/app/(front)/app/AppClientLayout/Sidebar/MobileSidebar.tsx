@@ -1,3 +1,5 @@
+import MenuButton from "@/components/MenuButton";
+import MenuContent from "@/components/MenuContent";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import Avatar from "@mui/material/Avatar";
@@ -6,8 +8,6 @@ import Divider from "@mui/material/Divider";
 import Drawer, { drawerClasses } from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import MenuButton from "../components/MenuButton";
-import MenuContent from "../components/MenuContent";
 
 interface SideMenuMobileProps {
   open: boolean | undefined;
