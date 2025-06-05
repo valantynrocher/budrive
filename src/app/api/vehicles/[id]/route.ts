@@ -5,14 +5,14 @@ import { formatRegistration } from "@/utils/fp/vehicles";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ): Promise<
   | NextResponse<{
       error: string;
     }>
   | NextResponse<Tables<"vehicles">>
 > {
-  const { id } = context.params;
+  const { id } = await context.params;
   const {
     data: vehicle,
     error,
