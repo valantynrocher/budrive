@@ -1,9 +1,9 @@
 "use client";
-import { DesktopSidebar } from "@/app/(private)/app/AppClientLayout/Sidebar";
+import { DesktopSidebar } from "@/app/(front)/app/AppClientLayout/Sidebar";
 import {
   DesktopTopbar,
   MobileTopbar,
-} from "@/app/(private)/app/AppClientLayout/Topbar";
+} from "@/app/(front)/app/AppClientLayout/Topbar";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import { alpha } from "@mui/material/styles";

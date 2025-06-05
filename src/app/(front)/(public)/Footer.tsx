@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/X";
-import BudriveIcon from "../../components/BudriveIcon";
+import BudriveIcon from "../../../components/BudriveIcon";
 
 function Copyright() {
   return (

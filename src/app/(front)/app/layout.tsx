@@ -1,4 +1,4 @@
-import AppClientLayout from "@/app/(private)/app/AppClientLayout";
+import AppClientLayout from "@/app/(front)/app/AppClientLayout";
 import { supabase } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 

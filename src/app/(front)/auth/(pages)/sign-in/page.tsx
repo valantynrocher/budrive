@@ -1,4 +1,4 @@
-import SignInForm from "@/app/auth/(pages)/sign-in/SignInForm";
+import SignInForm from "@/app/(front)/auth/(pages)/sign-in/SignInForm";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 

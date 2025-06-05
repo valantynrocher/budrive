@@ -1,4 +1,4 @@
-import AuthClientLayout from "@/app/auth/(components)/AuthClientLayout";
+import AuthClientLayout from "@/app/(front)/auth/(components)/AuthClientLayout";
 
 type AppLayoutProps = Readonly<{
   children: React.ReactNode;
