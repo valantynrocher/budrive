@@ -6,9 +6,8 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent, selectClasses } from "@mui/material/Select";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const VehicleSelector = () => {
   const [vehicles, setVehicles] = useState<Tables<"vehicles">[]>([]);
@@ -29,6 +28,7 @@ const VehicleSelector = () => {
 
   useEffect(() => {
     if (selectedId !== null) router.push(`/dashboard/${selectedId}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
   const handleChange = (event: SelectChangeEvent) => {

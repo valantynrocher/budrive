@@ -7,7 +7,6 @@ import translateErrorCode from "@/utils/supabase/error-translation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import MuiLink from "@mui/material/Link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

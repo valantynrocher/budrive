@@ -122,12 +122,12 @@ export function MobileLayout({
             }),
           })}
           style={
-            items[selectedItemIndex]
+            (items[selectedItemIndex]
               ? ({
                   "--items-imageLight": items[selectedItemIndex].imageLight,
                   "--items-imageDark": items[selectedItemIndex].imageDark,
-                } as any)
-              : {}
+                } as unknown)
+              : {}) as React.CSSProperties
           }
         />
         <Box sx={{ px: 2, pb: 2 }}>
@@ -270,12 +270,12 @@ export default function Features() {
                 }),
               })}
               style={
-                items[selectedItemIndex]
-                  ? ({
+                (items[selectedItemIndex]
+                  ? {
                       "--items-imageLight": items[selectedItemIndex].imageLight,
                       "--items-imageDark": items[selectedItemIndex].imageDark,
-                    } as any)
-                  : {}
+                    }
+                  : {}) as React.CSSProperties
               }
             />
           </Card>

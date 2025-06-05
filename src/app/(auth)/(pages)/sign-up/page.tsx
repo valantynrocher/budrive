@@ -135,7 +135,7 @@ const SignUpPage = () => {
           variant="contained"
           onClick={validateInputs}
         >
-          S'inscrire
+          S&apos;inscrire
         </Button>
       </Box>
       <Divider>
