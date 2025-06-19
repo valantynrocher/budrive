@@ -1,15 +1,15 @@
+import MobileSidebar from "@/app/(front)/app/AppClientLayout/Sidebar/MobileSidebar";
+import BudriveIcon from "@/components/BudriveIcon";
 import ColorModeIconDropdown from "@/components/ColorModeIconDropdown";
+import LogoutButtonManager from "@/components/LogoutButtonManager";
 import MenuButton from "@/components/MenuButton";
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import { tabsClasses } from "@mui/material/Tabs";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import { useState } from "react";
-import SideMenuMobile from "./SideMenuMobile";
 
 const MobileTopbar = () => {
   const [open, setOpen] = useState(false);
@@ -63,20 +63,20 @@ const MobileTopbar = () => {
             spacing={1}
             sx={{ justifyContent: "center", mr: "auto" }}
           >
-            <CustomIcon />
-            <Typography
-              variant="h4"
-              component="h1"
-              sx={{ color: "text.primary" }}
-            >
-              Budrive
-            </Typography>
+            <BudriveIcon />
           </Stack>
           <ColorModeIconDropdown />
+          <LogoutButtonManager
+            Component={({ onClick }) => (
+              <MenuButton aria-label="menu" onClick={onClick}>
+                <LogoutRoundedIcon />
+              </MenuButton>
+            )}
+          />
           <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
           </MenuButton>
-          <SideMenuMobile open={open} toggleDrawer={toggleDrawer} />
+          <MobileSidebar open={open} toggleDrawer={toggleDrawer} />
         </Stack>
       </Toolbar>
     </AppBar>
@@ -84,28 +84,3 @@ const MobileTopbar = () => {
 };
 
 export default MobileTopbar;
-
-export function CustomIcon() {
-  return (
-    <Box
-      sx={{
-        width: "1.5rem",
-        height: "1.5rem",
-        bgcolor: "black",
-        borderRadius: "999px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        alignSelf: "center",
-        backgroundImage:
-          "linear-gradient(135deg, hsl(210, 98%, 60%) 0%, hsl(210, 100%, 35%) 100%)",
-        color: "hsla(210, 100%, 95%, 0.9)",
-        border: "1px solid",
-        borderColor: "hsl(210, 100%, 55%)",
-        boxShadow: "inset 0 2px 5px rgba(255, 255, 255, 0.3)",
-      }}
-    >
-      <DashboardRoundedIcon color="inherit" sx={{ fontSize: "1rem" }} />
-    </Box>
-  );
-}

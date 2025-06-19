@@ -1,3 +1,5 @@
+import OptionsMenu from "@/app/(front)/app/AppClientLayout/Sidebar/DesktopSidebar/OptionsMenu";
+import VehicleSelector from "@/app/(front)/app/AppClientLayout/Sidebar/VehicleSelector";
 import MenuContent from "@/components/MenuContent";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -5,8 +7,6 @@ import Divider from "@mui/material/Divider";
 import Drawer, { drawerClasses } from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import OptionsMenu from "./OptionsMenu";
-import VehicleSelector from "./VehicleSelector";
 
 const drawerWidth = 240;
 

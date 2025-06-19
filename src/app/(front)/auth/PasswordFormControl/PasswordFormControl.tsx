@@ -15,7 +15,6 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
-import { ZodError } from "zod/v4";
 
 type PasswordFormControlErrors = Partial<Record<keyof PasswordValues, string>>;
 
@@ -56,9 +55,12 @@ const PasswordFormControl = forwardRef<
     const result = passwordSchema.safeParse({ password, confirmation });
     if (!result.success) {
       const newErrors: Record<string, string> = {};
-      (result.error as ZodError<PasswordValues>).issues.forEach((err) => {
+      result.error.issues.forEach((err) => {
         const field = err.path[0];
         if (typeof field === "string") {
+          // In this case, we don't care about the confirmation's input validation
+          if (!withConfirm && field === "confirmation") return;
+
           newErrors[field] = err.message;
         }
       });
@@ -66,7 +68,7 @@ const PasswordFormControl = forwardRef<
     } else {
       setErrors({});
     }
-  }, [confirmation, password]);
+  }, [confirmation, password, withConfirm]);
 
   const handleClickDisplay = () => {
     setDisplay((display) => !display);

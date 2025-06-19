@@ -1,6 +1,6 @@
+import NavbarBreadcrumbs from "@/app/(front)/app/AppClientLayout/Topbar/DesktopTopbar/NavbarBreadcrumbs";
 import ColorModeIconDropdown from "@/components/ColorModeIconDropdown";
 import Stack from "@mui/material/Stack";
-import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
 
 const DesktopTopbar = () => {
   return (

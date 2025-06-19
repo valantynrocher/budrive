@@ -1,3 +1,4 @@
+import LogoutButtonManager from "@/components/LogoutButtonManager";
 import MenuButton from "@/components/MenuButton";
 import MenuContent from "@/components/MenuContent";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
@@ -42,7 +43,6 @@ const MobileSidebar = ({ open, toggleDrawer }: SideMenuMobileProps) => {
             <Avatar
               sizes="small"
               alt="Riley Carter"
-              src="/static/images/avatar/7.jpg"
               sx={{ width: 24, height: 24 }}
             />
             <Typography component="p" variant="h6">
@@ -60,13 +60,18 @@ const MobileSidebar = ({ open, toggleDrawer }: SideMenuMobileProps) => {
         </Stack>
         {/* <CardAlert /> */}
         <Stack sx={{ p: 2 }}>
-          <Button
-            variant="outlined"
-            fullWidth
-            startIcon={<LogoutRoundedIcon />}
-          >
-            Logout
-          </Button>
+          <LogoutButtonManager
+            Component={({ onClick }) => (
+              <Button
+                onClick={onClick}
+                variant="outlined"
+                fullWidth
+                startIcon={<LogoutRoundedIcon />}
+              >
+                Déconnexion
+              </Button>
+            )}
+          />
         </Stack>
       </Stack>
     </Drawer>

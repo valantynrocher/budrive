@@ -17,7 +17,7 @@ export const passwordSchema = z
   });
 export type PasswordValues = z.infer<typeof passwordSchema>;
 
-export const signUpDataSchema = z.object({
+export const authDataSchemaBase = z.object({
   email: emailSchema,
   password: passwordSchema.shape.password,
 });

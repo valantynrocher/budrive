@@ -3,7 +3,7 @@ import { useTheme } from "@mui/material";
 import Breadcrumbs, { breadcrumbsClasses } from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 
-export default function NavbarBreadcrumbs() {
+const NavbarBreadcrumbs = () => {
   const theme = useTheme();
   return (
     <Breadcrumbs
@@ -29,4 +29,6 @@ export default function NavbarBreadcrumbs() {
       </Typography>
     </Breadcrumbs>
   );
-}
+};
+
+export default NavbarBreadcrumbs;

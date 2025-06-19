@@ -1,78 +1,73 @@
 "use client";
 import EmailFormControl from "@/app/(front)/auth/EmailFormControl";
-import PasswordFormControl from "@/app/(front)/auth/PasswordFormControl/PasswordFormControl";
+import { EmailFormControlRef } from "@/app/(front)/auth/EmailFormControl/EmailFormControl";
+import PasswordFormControl, {
+  PasswordFormControlRef,
+} from "@/app/(front)/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ErrorSnackbar";
 import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";
+import z, { authDataSchemaBase } from "@/utils/zod/auth";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-type FormKeys = "email" | "password";
-const initialErrors: Record<FormKeys, null | string> = {
-  email: null,
-  password: null,
-};
+import { useRef, useState } from "react";
 
 const translateAuthErrorCode = translateErrorCode("auth");
 
 const SignInForm = () => {
+  const emailRef = useRef<EmailFormControlRef>(null);
+  const passwordRef = useRef<PasswordFormControlRef>(null);
+
   const [loading, setLoading] = useState(false);
-  const [inputErrors, setInputErrors] = useState(initialErrors);
-  const [authErrorMessage, setAuthErrorMessage] = useState("");
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const router = useRouter();
+
+  const handleErrorClose = () => {
+    setServerError(null);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // Perforom client validations on form's inputs
-    const form = event.currentTarget;
-    const inputs = Array.from(form.elements) as HTMLInputElement[];
-    const newErrors: typeof inputErrors = Object.create(initialErrors);
-    inputs.forEach((input) => {
-      if (input.tagName !== "INPUT") return;
+    const emailError = emailRef.current?.getError();
+    if (Boolean(emailError)) return;
 
-      if (!input.validity.valid) {
-        newErrors[input.name as FormKeys] = input.validationMessage;
-      }
-    });
-    console.log("signIn submit", {
-      formIsValid: form.checkValidity(),
-    });
+    const passwordErrors = passwordRef.current?.getErrors();
+    const hasPasswordErrors = passwordErrors
+      ? Object.keys(passwordErrors).length > 0
+      : false;
+    if (hasPasswordErrors) return;
 
-    if (Object.keys(newErrors).length > 0) {
-      setInputErrors(newErrors);
-      return;
-    }
+    const email = emailRef.current?.getValue();
+    if (!email) return;
+
+    const { password } = passwordRef.current?.getValues() ?? {};
+    if (!password) return;
 
     // No client error : perform server action
-    setInputErrors(initialErrors);
     setLoading(true);
-    setAuthErrorMessage("");
+    setServerError(null);
 
-    const formData = new FormData(form);
-    const credentials = {
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
+    // Send Sign Up data to the server
+    const data: z.infer<typeof authDataSchemaBase> = {
+      email,
+      password,
     };
-    const { error: authError } = await supabase.auth.signInWithPassword(
-      credentials
-    );
+    const { error: authError } = await supabase.auth.signInWithPassword(data);
 
     // Deal with server action response
+    // Deal with the server's response
     if (authError) {
-      setAuthErrorMessage(translateAuthErrorCode(authError.code));
+      setServerError(translateAuthErrorCode(authError.code));
       setLoading(false);
     } else {
+      router.refresh();
       router.push("/app/dashboard");
     }
-  };
-
-  const handleErrorClose = () => {
-    setAuthErrorMessage("");
   };
 
   return (
@@ -83,21 +78,16 @@ const SignInForm = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: "100%",
         gap: 2,
       }}
     >
-      <EmailFormControl error={inputErrors.email} />
-      <PasswordFormControl error={inputErrors.password} withForgot={true} />
-      {/* <FormControlLabel
-      control={<Checkbox value="remember" color="primary" />}
-      label="Se souvenir de moi"
-    /> */}
+      <EmailFormControl ref={emailRef} />
+      <PasswordFormControl ref={passwordRef} withForgot />
       <Button type="submit" fullWidth variant="contained">
         {loading ? <CircularProgress size={24} /> : "Se connecter"}
       </Button>
 
-      <ErrorSnackbar message={authErrorMessage} onClose={handleErrorClose} />
+      <ErrorSnackbar message={serverError} onClose={handleErrorClose} />
     </Box>
   );
 };

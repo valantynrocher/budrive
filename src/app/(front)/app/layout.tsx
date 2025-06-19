@@ -1,15 +1,16 @@
 import AppClientLayout from "@/app/(front)/app/AppClientLayout";
-import { supabase } from "@/utils/supabase/server";
+import { Database } from "@/utils/supabase/types";
 import { LayoutProps } from "@/utils/types/props";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const AppLayout = async (props: LayoutProps) => {
-  const { children } = props;
-  const { data, error } = await supabase.auth.getUser();
-  console.log("AppLayout", {
-    error,
-    data,
+const AppLayout = async ({ children }: LayoutProps) => {
+  const cookieStore = cookies(); // ici, `cookies()` est en réalité sync (contrairement à `headers()`)
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookieStore,
   });
+  const { data, error } = await supabase.auth.getUser();
 
   if (error || !data?.user) {
     redirect("/auth/sign-in");

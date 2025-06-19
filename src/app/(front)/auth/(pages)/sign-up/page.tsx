@@ -3,7 +3,7 @@ import EmailFormControl from "@/app/(front)/auth/EmailFormControl";
 import { EmailFormControlRef } from "@/app/(front)/auth/EmailFormControl/EmailFormControl";
 import PasswordFormControl from "@/app/(front)/auth/PasswordFormControl";
 import { PasswordFormControlRef } from "@/app/(front)/auth/PasswordFormControl/PasswordFormControl";
-import z, { signUpDataSchema } from "@/utils/zod/auth";
+import z, { authDataSchemaBase } from "@/utils/zod/auth";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -30,7 +30,6 @@ const SignUpPage = () => {
 
     // Perforom client validations on form's inputs
     const emailError = emailRef.current?.getError();
-    console.log("handleSubmit > emailError :", emailError);
     if (Boolean(emailError)) return;
 
     const passwordErrors = passwordRef.current?.getErrors();
@@ -50,15 +49,15 @@ const SignUpPage = () => {
     setServerError(null);
 
     // Send Sign Up data to the server
-    const data: z.infer<typeof signUpDataSchema> = {
+    const data: z.infer<typeof authDataSchemaBase> = {
       email,
       password,
     };
-    const { error: serverError } = await supabase.auth.signUp(data);
+    const { error: authError } = await supabase.auth.signUp(data);
 
     // Deal with the server's response
-    if (serverError) {
-      setServerError(translateAuthErrorCode(serverError.code));
+    if (authError) {
+      setServerError(translateAuthErrorCode(authError.code));
       setLoading(false);
     } else {
       router.push("/app/dashboard");
@@ -81,6 +80,7 @@ const SignUpPage = () => {
       <Box
         component="form"
         onSubmit={handleSubmit}
+        noValidate
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
         {/* <FormControl>
