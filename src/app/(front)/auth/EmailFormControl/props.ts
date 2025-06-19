@@ -1,1 +1,1 @@
-export type EmailFormControlProps = { error?: string | null };
+export type EmailFormControlProps = unknown;

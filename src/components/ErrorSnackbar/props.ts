@@ -1,4 +1,4 @@
 export type ErrorSnackbarProps = {
-  message?: string;
+  message?: string | null;
   onClose?: () => void;
 };

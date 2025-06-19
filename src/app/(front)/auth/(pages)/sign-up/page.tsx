@@ -1,73 +1,72 @@
 "use client";
-import FacebookIcon from "@/components/FacebookIcon";
-import GoogleIcon from "@/components/GoogleIcon";
+import EmailFormControl from "@/app/(front)/auth/EmailFormControl";
+import { EmailFormControlRef } from "@/app/(front)/auth/EmailFormControl/EmailFormControl";
+import PasswordFormControl from "@/app/(front)/auth/PasswordFormControl";
+import { PasswordFormControlRef } from "@/app/(front)/auth/PasswordFormControl/PasswordFormControl";
+import z, { signUpDataSchema } from "@/utils/zod/auth";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import Link from "next/link";
-import React from "react";
+import React, { useRef, useState } from "react";
+import { supabase } from "@/utils/supabase/browser";
+import translateErrorCode from "@/utils/supabase/error-translation";
+import { useRouter } from "next/navigation";
+import ErrorSnackbar from "@/components/ErrorSnackbar";
+import CircularProgress from "@mui/material/CircularProgress";
+
+const translateAuthErrorCode = translateErrorCode("auth");
 
 const SignUpPage = () => {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState("");
+  const emailRef = useRef<EmailFormControlRef>(null);
+  const passwordRef = useRef<PasswordFormControlRef>(null);
 
-  const validateInputs = () => {
-    const email = document.getElementById("email") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
-    const name = document.getElementById("name") as HTMLInputElement;
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-    let isValid = true;
+  const router = useRouter();
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
-      isValid = false;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // Perforom client validations on form's inputs
+    const emailError = emailRef.current?.getError();
+    console.log("handleSubmit > emailError :", emailError);
+    if (Boolean(emailError)) return;
+
+    const passwordErrors = passwordRef.current?.getErrors();
+    const hasPasswordErrors = passwordErrors
+      ? Object.keys(passwordErrors).length > 0
+      : false;
+    if (hasPasswordErrors) return;
+
+    const email = emailRef.current?.getValue();
+    if (!email) return;
+
+    const { password } = passwordRef.current?.getValues() ?? {};
+    if (!password) return;
+
+    // No client error : perform server action
+    setLoading(true);
+    setServerError(null);
+
+    // Send Sign Up data to the server
+    const data: z.infer<typeof signUpDataSchema> = {
+      email,
+      password,
+    };
+    const { error: serverError } = await supabase.auth.signUp(data);
+
+    // Deal with the server's response
+    if (serverError) {
+      setServerError(translateAuthErrorCode(serverError.code));
+      setLoading(false);
     } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
+      router.push("/app/dashboard");
     }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
-    }
-
-    if (!name.value || name.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage("Name is required.");
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage("");
-    }
-
-    return isValid;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get("name"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+  const handleErrorClose = () => {
+    setServerError(null);
   };
 
   return (
@@ -84,61 +83,30 @@ const SignUpPage = () => {
         onSubmit={handleSubmit}
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
-        <FormControl>
-          <FormLabel htmlFor="name">Prénom & Nom</FormLabel>
+        {/* <FormControl>
+          <FormLabel htmlFor="displayName">Prénom & Nom</FormLabel>
           <TextField
-            autoComplete="name"
-            name="name"
+            autoComplete="displayName"
+            name="displayName"
             required
             fullWidth
-            id="name"
+            id="displayName"
             placeholder="John Doe"
             error={nameError}
             helperText={nameErrorMessage}
             color={nameError ? "error" : "primary"}
           />
-        </FormControl>
-        <FormControl>
-          <FormLabel htmlFor="email">E-mail</FormLabel>
-          <TextField
-            required
-            fullWidth
-            id="email"
-            placeholder="your@email.com"
-            name="email"
-            autoComplete="email"
-            variant="outlined"
-            error={emailError}
-            helperText={emailErrorMessage}
-            color={passwordError ? "error" : "primary"}
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel htmlFor="password">Mot de passe</FormLabel>
-          <TextField
-            required
-            fullWidth
-            name="password"
-            placeholder="••••••"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            variant="outlined"
-            error={passwordError}
-            helperText={passwordErrorMessage}
-            color={passwordError ? "error" : "primary"}
-          />
-        </FormControl>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          onClick={validateInputs}
-        >
-          S&apos;inscrire
+        </FormControl> */}
+        <EmailFormControl ref={emailRef} />
+        <PasswordFormControl ref={passwordRef} withConfirm />
+        <Button type="submit" fullWidth variant="contained">
+          {loading ? <CircularProgress size={24} /> : "S'inscrire"}
         </Button>
       </Box>
-      <Divider>
+
+      <ErrorSnackbar message={serverError} onClose={handleErrorClose} />
+
+      {/* <Divider>
         <Typography sx={{ color: "text.secondary" }}>ou</Typography>
       </Divider>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -164,7 +132,7 @@ const SignUpPage = () => {
             Se connecter
           </Link>
         </Typography>
-      </Box>
+      </Box> */}
     </>
   );
 };
