@@ -1,3 +1,4 @@
+import { myVehicles } from "@/data/vehicles";
 import { Tables } from "@/utils/supabase/types/database";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { useTheme } from "@mui/material";
@@ -6,34 +7,20 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent, selectClasses } from "@mui/material/Select";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const VehicleSelector = () => {
-  const [vehicles, setVehicles] = useState<Tables<"vehicles">[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [vehicles] = useState<Tables<"vehicles">[]>(myVehicles);
   const router = useRouter();
+  const params = useParams();
   const theme = useTheme();
 
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      const response = await fetch("/api/vehicles");
-      const data = await response.json();
-      setVehicles(data);
-      setSelectedId(data[0]?.id || null);
-    };
-
-    fetchVehicles();
-  }, []);
-
-  useEffect(() => {
-    if (selectedId !== null) router.push(`/dashboard/${selectedId}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId]);
+  const selectedId = params?.vehicleId ? Number(params.vehicleId) : null;
 
   const handleChange = (event: SelectChangeEvent) => {
     const nextId = event.target.value;
-    setSelectedId(nextId);
+    router.push(`/app/dashboard/${nextId}`);
   };
 
   return (
