@@ -1,1 +1,3 @@
-export type AppClientLayoutProps = { children: React.ReactNode };
+import { PropsWithChildren } from "react";
+
+export type AppClientLayoutProps = PropsWithChildren<unknown>;
