@@ -27,46 +27,11 @@ declare module "@mui/material/styles" {
 const defaultTheme = createTheme();
 
 export const myPalette = {
-  yellow: {
-    hex: "#ede342",
-    rgb: [237, 227, 66],
-    cmyk: [0, 4, 72, 7],
-    hsb: [56, 72, 93],
-    hsl: [56, 83, 59],
-    lab: [89, -14, 75],
-  },
-  orange: {
-    hex: "#f2bf6c",
-    rgb: [242, 191, 108],
-    cmyk: [0, 21, 55, 5],
-    hsb: [37, 55, 95],
-    hsl: [37, 84, 69],
-    lab: [80, 9, 48],
-  },
-  coral: {
-    hex: "#f69a97",
-    rgb: [246, 154, 151],
-    cmyk: [0, 37, 39, 4],
-    hsb: [2, 39, 96],
-    hsl: [2, 84, 78],
-    lab: [73, 34, 16],
-  },
-  pink: {
-    hex: "#fb76c1",
-    rgb: [251, 118, 193],
-    cmyk: [0, 53, 23, 2],
-    hsb: [326, 53, 98],
-    hsl: [326, 94, 72],
-    lab: [68, 59, -15],
-  },
-  purple: {
-    hex: "#ff51eb",
-    rgb: [255, 81, 235],
-    cmyk: [0, 68, 8, 0],
-    hsb: [307, 68, 100],
-    hsl: [307, 100, 66],
-    lab: [64, 81, -43],
-  },
+  yellow: "#ffee00",
+  orange: "#f2bf6c",
+  coral: "#f69a97",
+  pink: "#fb76c1",
+  purple: "#ff51eb",
 };
 
 export const colorSchemes = {
@@ -74,27 +39,27 @@ export const colorSchemes = {
     palette: {
       primary: defaultTheme.palette.augmentColor({
         color: {
-          main: myPalette.yellow.hex,
+          main: myPalette.yellow,
         },
       }),
       secondary: defaultTheme.palette.augmentColor({
         color: {
-          main: myPalette.pink.hex,
+          main: myPalette.pink,
         },
       }),
       warning: defaultTheme.palette.augmentColor({
         color: {
-          main: myPalette.orange.hex,
+          main: myPalette.orange,
         },
       }),
       error: defaultTheme.palette.augmentColor({
         color: {
-          main: myPalette.coral.hex,
+          main: myPalette.coral,
         },
       }),
       info: defaultTheme.palette.augmentColor({
         color: {
-          main: myPalette.purple.hex,
+          main: myPalette.purple,
         },
       }),
       background: {
@@ -113,7 +78,7 @@ export const colorSchemes = {
     palette: {
       primary: defaultTheme.palette.augmentColor({
         color: {
-          main: "#d3c836", // dérivé de yellow adapté au dark
+          main: "#d4c700", // dérivé de yellow adapté au dark
         },
       }),
       secondary: defaultTheme.palette.augmentColor({

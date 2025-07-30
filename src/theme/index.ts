@@ -1,5 +1,5 @@
 "use client";
-import { extendTheme } from "@mui/material";
+import { alpha, extendTheme } from "@mui/material/styles";
 import { colorSchemes, shadows, shape, typography } from "./themePrimitives";
 
 const theme = extendTheme({
@@ -10,6 +10,24 @@ const theme = extendTheme({
   typography,
   shadows,
   shape,
+  components: {
+    MuiMenuItem: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          "&:hover": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.3),
+          },
+          "&.Mui-selected": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.5),
+            color: theme.palette.primary.contrastText,
+          },
+          "&.Mui-selected:hover": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.8),
+          },
+        }),
+      },
+    },
+  },
 });
 
 export default theme;
