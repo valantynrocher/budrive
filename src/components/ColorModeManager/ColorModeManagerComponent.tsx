@@ -7,20 +7,24 @@ import MenuItem from "@mui/material/MenuItem";
 import { useColorScheme } from "@mui/material/styles";
 import React, { useState } from "react";
 
-export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
+const ColorModeManager = (props: IconButtonOwnProps) => {
   const { mode, systemMode, setMode } = useColorScheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const handleMode = (targetMode: "system" | "light" | "dark") => () => {
     setMode(targetMode);
     handleClose();
   };
+
   if (!mode) {
     return (
       <Box
@@ -37,11 +41,14 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
       />
     );
   }
+
   const resolvedMode = (systemMode || mode) as "light" | "dark";
+
   const icon = {
-    light: <LightModeIcon />,
-    dark: <DarkModeIcon />,
+    light: <LightModeIcon fontSize="small" />,
+    dark: <DarkModeIcon fontSize="small" />,
   }[resolvedMode];
+
   return (
     <React.Fragment>
       <IconButton
@@ -52,6 +59,18 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
         aria-controls={open ? "color-scheme-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
+        sx={{
+          bgcolor: "primary.main",
+          color: "primary.dark",
+          borderRadius: 1,
+          p: 1,
+          "&:hover": {
+            backgroundColor: "primary.dark",
+            "& svg": {
+              color: "primary.light",
+            },
+          },
+        }}
         {...props}
       >
         {icon}
@@ -68,6 +87,9 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
             elevation: 0,
             sx: {
               my: "4px",
+              "& .MuiList-root": {
+                padding: 0,
+              },
             },
           },
         }}
@@ -86,4 +108,6 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
       </Menu>
     </React.Fragment>
   );
-}
+};
+
+export default ColorModeManager;
