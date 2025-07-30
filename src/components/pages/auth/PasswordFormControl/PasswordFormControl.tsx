@@ -1,5 +1,4 @@
 "use client";
-import { PasswordFormControlProps } from "@/components/auth/PasswordFormControl/props";
 import { type PasswordValues, passwordSchema } from "@/utils/zod/auth";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -15,6 +14,7 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
+import { PasswordFormControlProps } from "./props";
 
 type PasswordFormControlErrors = Partial<Record<keyof PasswordValues, string>>;
 

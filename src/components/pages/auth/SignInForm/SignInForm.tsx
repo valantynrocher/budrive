@@ -1,9 +1,9 @@
 "use client";
-import EmailFormControl from "@/components/auth/EmailFormControl";
-import { EmailFormControlRef } from "@/components/auth/EmailFormControl/EmailFormControl";
+import EmailFormControl from "@/components/pages/auth/EmailFormControl";
+import { EmailFormControlRef } from "@/components/pages/auth/EmailFormControl/EmailFormControl";
 import PasswordFormControl, {
   PasswordFormControlRef,
-} from "@/components/auth/PasswordFormControl/PasswordFormControl";
+} from "@/components/pages/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
 import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";

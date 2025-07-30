@@ -1,5 +1,3 @@
-import { ForgotPasswordProps } from "@/app/(front)/auth/(pages)/sign-in/ForgotPassword/props";
-import React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -7,6 +5,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import OutlinedInput from "@mui/material/OutlinedInput";
+import React from "react";
+import { ForgotPasswordProps } from "./props";
 
 const ForgotPassword = (props: ForgotPasswordProps) => {
   const { open, handleClose } = props;
