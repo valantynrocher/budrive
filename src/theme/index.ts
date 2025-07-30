@@ -20,6 +20,9 @@ const theme = extendTheme({
           "&.Mui-selected": {
             backgroundColor: alpha(theme.palette.primary.main, 0.5),
             color: theme.palette.primary.contrastText,
+            "& .MuiSvgIcon-root": {
+              color: theme.palette.primary.contrastText,
+            },
           },
           "&.Mui-selected:hover": {
             backgroundColor: alpha(theme.palette.primary.main, 0.8),
