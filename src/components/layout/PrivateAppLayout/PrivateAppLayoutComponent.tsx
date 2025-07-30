@@ -1,11 +1,10 @@
 "use client";
 import Appbar from "@/components/layout/PrivateAppLayout/Appbar";
-import Breadcrumbs from "@/components/layout/PrivateAppLayout/Breadcrumbs";
+import AppbarOffset from "@/components/layout/PrivateAppLayout/AppbarOffset";
 import DesktopAppDrawer from "@/components/layout/PrivateAppLayout/DesktopAppDrawer";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import { PrivateAppLayoutProps } from "./props";
-import AppbarOffset from "@/components/layout/PrivateAppLayout/AppbarOffset";
 
 const PrivateAppLayoutComponent = (props: PrivateAppLayoutProps) => {
   const { children } = props;
@@ -35,11 +34,12 @@ const PrivateAppLayoutComponent = (props: PrivateAppLayoutProps) => {
             px: 3,
             pt: 2,
             pb: 3,
+            mr: 2,
             backgroundColor: "background.paper",
             borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
           }}
         >
-          <Breadcrumbs />
           {children}
         </Stack>
       </Box>
