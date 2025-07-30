@@ -1,8 +1,8 @@
-import AppClientLayout from "@/app/(front)/app/AppClientLayout";
+import PrivateAppLayoutComponent from "@/components/layout/PrivateAppLayout";
 import { LayoutProps } from "@/utils/types/props";
 
 const AppLayout = async ({ children }: LayoutProps) => {
-  return <AppClientLayout>{children}</AppClientLayout>;
+  return <PrivateAppLayoutComponent>{children}</PrivateAppLayoutComponent>;
 };
 
 export default AppLayout;

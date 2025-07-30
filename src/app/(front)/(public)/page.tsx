@@ -1,10 +1,10 @@
-import AppAppBar from "./AppAppBar";
-import Hero from "./Hero";
+import AppBar from "../../../components/pages/public/AppBar";
+import Hero from "../../../components/pages/public/Hero";
 
 export default function MarketingPage() {
   return (
     <>
-      <AppAppBar />
+      <AppBar />
       <Hero />
     </>
   );

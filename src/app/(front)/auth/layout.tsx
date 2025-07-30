@@ -1,9 +1,9 @@
-import AuthClientLayout from "@/app/(front)/auth/AuthClientLayout";
+import AuthLayout from "@/components/layout/AuthLayout";
 import { LayoutProps } from "@/utils/types/props";
 
-const AuthLayout = (props: LayoutProps) => {
+const AuthPagesLayout = (props: LayoutProps) => {
   const { children } = props;
-  return <AuthClientLayout>{children}</AuthClientLayout>;
+  return <AuthLayout>{children}</AuthLayout>;
 };
 
-export default AuthLayout;
+export default AuthPagesLayout;
