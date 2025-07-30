@@ -1,8 +1,9 @@
 import AppbarOffset from "@/components/layout/PrivateAppLayout/AppbarOffset";
 import { DRAWER_WIDTH } from "@/components/layout/PrivateAppLayout/constants";
 import NavigationMenu from "@/components/layout/PrivateAppLayout/NavigationMenu/NavigationMenu";
-import Box from "@mui/material/Box";
+import VehicleSelector from "@/components/VehicleSelector";
 import Drawer, { drawerClasses } from "@mui/material/Drawer";
+import Stack from "@mui/material/Stack";
 
 const DesktopAppDrawer = () => {
   return (
@@ -22,17 +23,16 @@ const DesktopAppDrawer = () => {
       }}
     >
       <AppbarOffset />
-      <Box
-        sx={{
-          overflow: "auto",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
+      <Stack
+        direction="column"
+        height="100%"
+        overflow="auto"
+        sx={{ padding: 1 }}
       >
+        <VehicleSelector />
         <NavigationMenu />
         {/* <CardAlert /> */}
-      </Box>
+      </Stack>
     </Drawer>
   );
 };

@@ -1,4 +1,6 @@
-import useSelectedVehicle from "@/utils/hooks/useSelectedVehicle";
+import { useVehicleContext } from "@/components/contexts/VehicleContext";
+import { buildVehicleSectionUrl } from "@/utils/fp/routes";
+import { VehicleId } from "@/utils/types/vehicles";
 import CarRepairRoundedIcon from "@mui/icons-material/CarRepairRounded";
 import DirectionsCarRoundedIcon from "@mui/icons-material/DirectionsCarRounded";
 import FolderRoundedIcon from "@mui/icons-material/FolderRounded";
@@ -19,7 +21,7 @@ type NavigationMenuItem = {
   text: string;
   icon: React.ReactNode;
   pattern?: string;
-  to?: string;
+  to: string | ((vehicleId: VehicleId | null) => string);
   disabled?: boolean;
 };
 
@@ -38,28 +40,32 @@ const vehicleMenuItems: NavigationMenuItem[] = [
     text: "Mon véhicule",
     icon: <DirectionsCarRoundedIcon />,
     pattern: "/app/dashboard/:vehicle_id/vehicule",
-    to: "/app/dashboard/vehicule",
+    to: (vehicleId: VehicleId | null) =>
+      buildVehicleSectionUrl("vehicule", vehicleId),
   },
   {
     id: "insurance",
     text: "Mon asssurance",
     icon: <ShieldRoundedIcon />,
     pattern: "/app/dashboard/:vehicle_id/assurance",
-    to: "/app/dashboard/assurance",
+    to: (vehicleId: VehicleId | null) =>
+      buildVehicleSectionUrl("assurance", vehicleId),
   },
   {
     id: "repairs",
     text: "Mes réparations",
     icon: <CarRepairRoundedIcon />,
     pattern: "/app/dashboard/:vehicle_id/reparations",
-    to: "/app/dashboard/reparations",
+    to: (vehicleId: VehicleId | null) =>
+      buildVehicleSectionUrl("reparations", vehicleId),
   },
   {
     id: "documents",
     text: "Mes documents",
     icon: <FolderRoundedIcon />,
     pattern: "/app/dashboard/:vehicle_id/documents",
-    to: "/app/dashboard/documents",
+    to: (vehicleId: VehicleId | null) =>
+      buildVehicleSectionUrl("documents", vehicleId),
   },
 ];
 
@@ -72,15 +78,20 @@ const utilsMenuItems: NavigationMenuItem[] = [
   },
 ];
 
-const useSelectedNavItem = (items: NavigationMenuItem[]) => {
+const useSelectedNavItem = (
+  items: NavigationMenuItem[],
+  vehicleId: VehicleId | null
+) => {
   const pathname = usePathname();
 
   return items.find((item) => {
-    const { pattern = "", to = "" } = item;
+    const { pattern = "" } = item;
 
     const matcherPattern = match(pattern, { decode: decodeURIComponent });
     const matchedPattern = matcherPattern(pathname);
 
+    const to = typeof item.to === "function" ? item.to(vehicleId) : item.to;
+    // If `to` is a function, we need to match the resulting path
     const matcherTo = match(to, { decode: decodeURIComponent });
     const matchedTo = matcherTo(pathname);
 
@@ -90,34 +101,26 @@ const useSelectedNavItem = (items: NavigationMenuItem[]) => {
 
 const NavigationMenu = () => {
   const router = useRouter();
-  const vehicle_id = useSelectedVehicle();
-  const selectedItem = useSelectedNavItem([
-    ...mainMenuItems,
-    ...vehicleMenuItems,
-    ...utilsMenuItems,
-  ]);
+  const { vehicleId } = useVehicleContext();
+  const selectedItem = useSelectedNavItem(
+    [...mainMenuItems, ...vehicleMenuItems, ...utilsMenuItems],
+    vehicleId as VehicleId | null
+  );
 
   const handleClick = (item: NavigationMenuItem) => () => {
     if (item.disabled === true) return;
 
-    if (item.pattern) {
-      if (vehicle_id) {
-        const nextPath = item.pattern.replace(":vehicle_id", vehicle_id);
-        router.push(nextPath);
-        return;
-      } else if (item.to) {
-        router.push(item.to);
-        return;
-      }
-    } else if (item.to) {
-      const nextPath = item.to;
-      router.push(nextPath);
+    let nextPath = "";
+    if (typeof item.to === "function") {
+      nextPath = item.to(vehicleId as VehicleId | null);
+    } else {
+      nextPath = item.to;
     }
-    return;
+    router.push(nextPath);
   };
 
   return (
-    <Stack sx={{ flexGrow: 1, p: 1 }}>
+    <Stack sx={{ flexGrow: 1, py: 1 }}>
       <MenuList>
         {mainMenuItems.map((item) => (
           <MenuItem

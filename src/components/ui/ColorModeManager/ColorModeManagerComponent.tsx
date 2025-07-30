@@ -6,6 +6,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useColorScheme } from "@mui/material/styles";
 import React, { useState } from "react";
+import SystemIcon from "@mui/icons-material/DesktopMacRounded";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 
 const ColorModeManager = (props: IconButtonOwnProps) => {
   const { mode, systemMode, setMode } = useColorScheme();
@@ -44,10 +47,12 @@ const ColorModeManager = (props: IconButtonOwnProps) => {
 
   const resolvedMode = (systemMode || mode) as "light" | "dark";
 
-  const icon = {
+  const iconModeMatcher = {
     light: <LightModeIcon fontSize="small" />,
     dark: <DarkModeIcon fontSize="small" />,
-  }[resolvedMode];
+    system: <SystemIcon fontSize="small" />,
+  };
+  const ResolvedModeIcon = iconModeMatcher[resolvedMode];
 
   return (
     <React.Fragment>
@@ -73,7 +78,7 @@ const ColorModeManager = (props: IconButtonOwnProps) => {
         }}
         {...props}
       >
-        {icon}
+        {ResolvedModeIcon}
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -85,11 +90,10 @@ const ColorModeManager = (props: IconButtonOwnProps) => {
           paper: {
             variant: "outlined",
             elevation: 0,
+          },
+          list: {
             sx: {
-              my: "4px",
-              "& .MuiList-root": {
-                padding: 0,
-              },
+              padding: 1,
             },
           },
         }}
@@ -97,13 +101,16 @@ const ColorModeManager = (props: IconButtonOwnProps) => {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem selected={mode === "system"} onClick={handleMode("system")}>
-          System
+          <ListItemIcon>{iconModeMatcher["system"]}</ListItemIcon>
+          <ListItemText primary="Système" />
         </MenuItem>
         <MenuItem selected={mode === "light"} onClick={handleMode("light")}>
-          Light
+          <ListItemIcon>{iconModeMatcher["light"]}</ListItemIcon>
+          <ListItemText primary="Clair" />
         </MenuItem>
         <MenuItem selected={mode === "dark"} onClick={handleMode("dark")}>
-          Dark
+          <ListItemIcon>{iconModeMatcher["dark"]}</ListItemIcon>
+          <ListItemText primary="Sombre" />
         </MenuItem>
       </Menu>
     </React.Fragment>

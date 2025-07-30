@@ -14,6 +14,15 @@ const theme = extendTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: ({ theme }) => ({
+          borderRadius: 8,
+          marginTop: 4,
+          marginBottom: 4,
+          "&:first-of-type": {
+            marginTop: 0,
+          },
+          "&:last-of-type": {
+            marginBottom: 0,
+          },
           "&:hover": {
             backgroundColor: alpha(theme.palette.primary.main, 0.3),
           },

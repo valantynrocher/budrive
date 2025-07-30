@@ -1,9 +1,8 @@
-import { Tables } from "@/utils/supabase/types/database";
+import { VehicleData, vehicleSchema } from "@/utils/types/vehicles";
 
-export const myVehicles: Tables<"vehicles">[] = [
-  {
-    id: "1",
-    fuel: "Gasoline",
+export const myVehicles: VehicleData[] = [
+  vehicleSchema.parse({
+    fuel: "Diesel",
     make: "Peugeot",
     model: "207",
     mileage: 230000,
@@ -12,5 +11,5 @@ export const myVehicles: Tables<"vehicles">[] = [
     user_id: "user1",
     logo_marque: "https://example.com/logo_peugeot.png",
     registration: "AZ542CE",
-  },
+  }),
 ];
