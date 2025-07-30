@@ -1,6 +1,6 @@
 "use client";
 import BudriveIcon from "@/components/BudriveIcon";
-import ColorModeIconDropdown from "@/components/ColorModeIconDropdown";
+import ColorModeManager from "@/components/ColorModeManager";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import MenuIcon from "@mui/icons-material/Menu";
 import { alpha, useTheme } from "@mui/material";
@@ -119,10 +119,10 @@ export default function AppAppBar() {
                 Sign up
               </Link>
             </Button>
-            <ColorModeIconDropdown />
+            <ColorModeManager />
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
-            <ColorModeIconDropdown size="medium" />
+            <ColorModeManager size="medium" />
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
               <MenuIcon />
             </IconButton>
