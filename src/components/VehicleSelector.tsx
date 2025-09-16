@@ -45,24 +45,28 @@ const VehicleSelector = () => {
       >
         {vehicles.map((v) => (
           <MenuItem key={v.id} value={v.id}>
-            <ListItemAvatar
-              sx={{
-                minWidth: 0,
-                marginRight: 2,
-              }}
-            >
-              <Avatar
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <ListItemAvatar
                 sx={{
+                  minWidth: 0,
                   width: 28,
-                  height: 28,
-                  backgroundColor: (theme.vars || theme).palette.background
-                    .paper,
-                  color: (theme.vars || theme).palette.text.secondary,
-                  border: `1px solid ${(theme.vars || theme).palette.divider}`,
+                  marginRight: 2,
                 }}
-                alt={`${v.make} ${v.model}`}
               >
-                {/* {v.logo_marque ? (
+                <Avatar
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    backgroundColor: (theme.vars || theme).palette.background
+                      .paper,
+                    color: (theme.vars || theme).palette.text.secondary,
+                    border: `1px solid ${
+                      (theme.vars || theme).palette.divider
+                    }`,
+                  }}
+                  alt={`${v.make} ${v.model}`}
+                >
+                  {/* {v.logo_marque ? (
                 <Image
                   alt={`logo_${v.make}_${v.model}`}
                   src={v.logo_marque}
@@ -72,13 +76,14 @@ const VehicleSelector = () => {
               ) : (
                 <DirectionsCarIcon sx={{ fontSize: "1rem" }} />
               )} */}
-                <DirectionsCarIcon sx={{ fontSize: "1rem" }} />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              primary={`${v.make} ${v.model}`}
-              secondary={v.registration}
-            />
+                  <DirectionsCarIcon sx={{ fontSize: "1rem" }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={`${v.make} ${v.model}`}
+                secondary={v.registration}
+              />
+            </div>
           </MenuItem>
         ))}
       </Select>
