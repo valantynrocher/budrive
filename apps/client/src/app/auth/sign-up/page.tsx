@@ -4,7 +4,6 @@ import { EmailFormControlRef } from "@/components/pages/auth/EmailFormControl/Em
 import PasswordFormControl from "@/components/pages/auth/PasswordFormControl";
 import { PasswordFormControlRef } from "@/components/pages/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
-import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";
 import z, { authDataSchemaBase } from "@/utils/zod/auth";
 import Box from "@mui/material/Box";
@@ -49,19 +48,19 @@ const SignUpPage = () => {
     setServerError(null);
 
     // Send Sign Up data to the server
-    const data: z.infer<typeof authDataSchemaBase> = {
-      email,
-      password,
-    };
-    const { error: authError } = await supabase.auth.signUp(data);
+    // const data: z.infer<typeof authDataSchemaBase> = {
+    //   email,
+    //   password,
+    // };
+    // const { error: authError } = await supabase.auth.signUp(data);
 
     // Deal with the server's response
-    if (authError) {
-      setServerError(translateAuthErrorCode(authError.code));
-      setLoading(false);
-    } else {
-      router.push("/dashboard");
-    }
+    // if (authError) {
+    //   setServerError(translateAuthErrorCode(authError.code));
+    //   setLoading(false);
+    // } else {
+    //   router.push("/dashboard");
+    // }
   };
 
   const handleErrorClose = () => {

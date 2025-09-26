@@ -1,5 +1,4 @@
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
-import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,13 +14,13 @@ const LogoutButtonManager = ({ Component }: LogoutButtonManagerProps) => {
   const handleSignOutClick = async () => {
     setServerError(null);
 
-    const { error: authError } = await supabase.auth.signOut();
+    // const { error: authError } = await supabase.auth.signOut();
 
-    if (authError) {
-      setServerError(translateAuthErrorCode(authError.code));
-    } else {
-      router.push("/auth/sign-in");
-    }
+    // if (authError) {
+    //   setServerError(translateAuthErrorCode(authError.code));
+    // } else {
+    //   router.push("/auth/sign-in");
+    // }
   };
 
   const handleErrorClose = () => {

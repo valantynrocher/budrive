@@ -5,7 +5,6 @@ import PasswordFormControl, {
   PasswordFormControlRef,
 } from "@/components/pages/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
-import { supabase } from "@/utils/supabase/browser";
 import translateErrorCode from "@/utils/supabase/error-translation";
 import z, { authDataSchemaBase } from "@/utils/zod/auth";
 import Box from "@mui/material/Box";
@@ -53,21 +52,21 @@ const SignInForm = () => {
     setServerError(null);
 
     // Send Sign Up data to the server
-    const data: z.infer<typeof authDataSchemaBase> = {
-      email,
-      password,
-    };
-    const { error: authError } = await supabase.auth.signInWithPassword(data);
+    // const data: z.infer<typeof authDataSchemaBase> = {
+    //   email,
+    //   password,
+    // };
+    // const { error: authError } = await supabase.auth.signInWithPassword(data);
 
     // Deal with server action response
     // Deal with the server's response
-    if (authError) {
-      setServerError(translateAuthErrorCode(authError.code));
-      setLoading(false);
-    } else {
-      router.refresh();
-      router.push("/dashboard");
-    }
+    // if (authError) {
+    //   setServerError(translateAuthErrorCode(authError.code));
+    //   setLoading(false);
+    // } else {
+    //   router.refresh();
+    //   router.push("/dashboard");
+    // }
   };
 
   return (
