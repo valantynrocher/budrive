@@ -1,39 +1,16 @@
 {
-  "name": "my-app",
+  "name": "budrive",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.17.1",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean"
   },
   "dependencies": {
-    "@emotion/cache": "^11.14.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^7.1.0",
-    "@mui/material": "^7.1.0",
-    "@mui/material-nextjs": "^7.1.0",
-    "@mui/x-charts": "^8.4.0",
-    "@mui/x-data-grid": "^8.4.0",
-    "@mui/x-date-pickers": "^8.4.0",
-    "@mui/x-tree-view": "^8.4.0",
-    "@react-spring/web": "^10.0.1",
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.8",
-    "dayjs": "^1.11.13",
-    "next": "15.3.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.2",
-    "typescript": "^5"
+    "turbo": "^2.5.8"
   }
 }
