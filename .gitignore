@@ -1,0 +1,102 @@
+# -----------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------
+node_modules/
+.pnp
+.pnp.*
+
+# pnpm
+.pnpm-debug.log*
+
+# Yarn (si migration future)
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# -----------------------------------------------------
+# BUILD OUTPUT
+# -----------------------------------------------------
+# Next.js
+apps/client/.next/
+apps/client/out/
+
+# NestJS
+apps/server/dist/
+
+# Generic build folders
+build/
+temp/
+.tmp/
+
+# -----------------------------------------------------
+# LOGS
+# -----------------------------------------------------
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# -----------------------------------------------------
+# TESTS
+# -----------------------------------------------------
+coverage/
+.nyc_output/
+
+# -----------------------------------------------------
+# ENV FILES
+# (Ignorer tous les fichiers .env sauf si besoin d'en committer certains)
+# -----------------------------------------------------
+.env
+.env*.local
+
+# -----------------------------------------------------
+# IDE & OS FILES
+# -----------------------------------------------------
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Mac / OS
+.DS_Store
+
+# JetBrains IDEs
+.idea
+*.iml
+
+# Eclipse / Autres
+.project
+.classpath
+.settings/
+.c9/
+*.launch
+*.sublime-workspace
+
+# -----------------------------------------------------
+# TURBOREPO
+# Cache de TurboRepo
+# -----------------------------------------------------
+.turbo/
+
+# -----------------------------------------------------
+# TYPESCRIPT
+# -----------------------------------------------------
+*.tsbuildinfo
+next-env.d.ts
+
+# -----------------------------------------------------
+# RUNTIME DATA
+# -----------------------------------------------------
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (Node.js crash reports)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
