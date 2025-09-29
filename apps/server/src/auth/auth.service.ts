@@ -1,18 +1,14 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto/sign-up.dto';
 
 @Injectable()
 export class AuthService {
-  private prisma = new PrismaClient();
+  constructor(private readonly usersService: UsersService) {}
 
   async signUp(credentials: SignUpDto) {
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: credentials.email,
-      },
-    });
+    const existingUser = await this.usersService.findByEmail(credentials.email);
 
     if (existingUser) {
       throw new ConflictException(
@@ -20,18 +16,17 @@ export class AuthService {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(credentials.password, 10);
+    const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+    const passwordHash = await bcrypt.hash(credentials.password, SALT_ROUNDS);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: credentials.email,
-        passwordHash: hashedPassword,
-        fullName: credentials?.fullName,
-      },
+    const user = await this.usersService.create({
+      email: credentials.email,
+      passwordHash,
+      fullName: credentials?.fullName,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...safeUser } = user;
+    const { passwordHash: _ph, ...safeUser } = user;
     return safeUser;
   }
 }
