@@ -1,13 +1,13 @@
+import { AuthErrors } from "@/common/errors";
 import {
   ConflictException,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { UsersService } from '../users/users.service';
-import { SignInDto } from './dto/sign-in.dto';
-import { SignUpDto } from './dto/sign-up.dto';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import { UsersService } from "../users/users.service";
+import { SignInDto, SignUpDto } from "./auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -20,9 +20,7 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmail(credentials.email);
 
     if (existingUser) {
-      throw new ConflictException(
-        'Cet e-mail est déjà utilisé par un utilisateur.',
-      );
+      throw new ConflictException(AuthErrors.EMAIL_ALREADY_EXISTS);
     }
 
     const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
@@ -43,9 +41,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(credentials.email);
 
     if (!user) {
-      throw new UnauthorizedException(
-        "Il n'existe aucun utilisateur avec cet e-mail",
-      );
+      throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -54,7 +50,7 @@ export class AuthService {
     );
 
     if (!passwordMatch) {
-      throw new UnauthorizedException('Le mot de passe est incorrect');
+      throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
     }
 
     const payload = {
