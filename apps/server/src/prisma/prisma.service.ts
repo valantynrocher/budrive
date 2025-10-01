@@ -8,11 +8,11 @@ export class PrismaService
 {
   async onModuleInit() {
     await this.$connect();
-    console.log('✅ Prisma connected to Supabase');
+    // console.log('✅ Prisma connected to Supabase');
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
-    console.log('❌ Prisma disconnected');
+    // console.log('❌ Prisma disconnected');
   }
 }
