@@ -20,6 +20,14 @@ class AuthCredentialsDto {
 }
 
 export class SignUpDto extends AuthCredentialsDto {
+  @IsNotEmpty({
+    message: AuthErrors.PASSWORD_REQUIRED,
+  })
+  @MinLength(8, {
+    message: AuthErrors.PASSWORD_TOO_SHORT,
+  })
+  confirmPassword: string;
+
   @IsOptional()
   fullName?: string;
 }

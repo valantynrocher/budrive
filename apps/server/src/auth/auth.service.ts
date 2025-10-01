@@ -1,5 +1,6 @@
 import { AuthErrors } from "@/common/errors";
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -21,6 +22,10 @@ export class AuthService {
 
     if (existingUser) {
       throw new ConflictException(AuthErrors.EMAIL_ALREADY_EXISTS);
+    }
+
+    if (credentials.password !== credentials.confirmPassword) {
+      throw new BadRequestException(AuthErrors.CONFIRM_PASSWORD_NOT_MATCH);
     }
 
     const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);

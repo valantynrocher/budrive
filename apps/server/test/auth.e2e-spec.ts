@@ -15,7 +15,7 @@ describe("Auth features (e2e)", () => {
   let app: INestApplication<App>;
   const prisma = new PrismaService();
 
-  const [email1, email2, email3, email4, email5] = Array.from(
+  const [email1, email2, email3, email4, email5, email6] = Array.from(
     Array(10).keys(),
   ).map((value) => `newuser${value + 1}@example.com`);
 
@@ -27,7 +27,13 @@ describe("Auth features (e2e)", () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true, // renvoie une erreur si une propriété non définie est présente
+        transform: true,
+      }),
+    );
     await app.init();
   });
 
@@ -40,21 +46,23 @@ describe("Auth features (e2e)", () => {
 
     describe("Success cases", () => {
       it("→ should create a new user with valid credentials", async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post(endpoint)
           .send({
             email: email1,
             password,
+            confirmPassword: password,
           })
-          .expect(201);
-
-        expect((response.body as SignUpDto).email).toBe(email1);
+          .expect(201)
+          .expect((res) => {
+            expect((res.body as SignUpDto).email).toBe(email1);
+          });
       });
 
       it("→ should hash the password in database after sign-up", async () => {
         await request(app.getHttpServer())
           .post(endpoint)
-          .send({ email: email2, password })
+          .send({ email: email2, password, confirmPassword: password })
           .expect(201);
 
         const user = await prisma.user.findUnique({ where: { email: email2 } });
@@ -65,74 +73,98 @@ describe("Auth features (e2e)", () => {
       });
 
       it("→ should return the created user without sensitive fields (e.g. password)", async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post(endpoint)
           .send({
             email: email3,
             password,
+            confirmPassword: password,
           })
-          .expect(201);
-
-        expect(response.body).not.toHaveProperty("password");
+          .expect(201)
+          .expect((res) => {
+            expect(res.body).not.toHaveProperty("password");
+            expect(res.body).not.toHaveProperty("confirmPassword");
+          });
       });
     });
 
     describe("Validation errors", () => {
       describe("email field", () => {
         it("→ should not allow missing email", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               password,
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.EMAIL_REQUIRED,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as unknown).message).toContain(
+                AuthErrors.EMAIL_REQUIRED,
+              );
+            });
         });
 
         it("→ should not allow invalid email format", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               email: "testuser@example",
               password,
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.EMAIL_INVALID,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as unknown).message).toContain(
+                AuthErrors.EMAIL_INVALID,
+              );
+            });
         });
       });
 
       describe("password field", () => {
         it("→ should not allow missing password", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               email: email4,
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.PASSWORD_REQUIRED,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as unknown).message).toContain(
+                AuthErrors.PASSWORD_REQUIRED,
+              );
+            });
         });
 
-        it("→ should not allow to short password (under 8 characters)", async () => {
-          const response = await request(app.getHttpServer())
+        it("→ should not allow password that not match with confirmPassword", async () => {
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               email: email5,
-              password: "123",
+              password,
+              confirmPassword: "strongPassword",
             })
-            .expect(400);
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as unknown).message).toContain(
+                AuthErrors.CONFIRM_PASSWORD_NOT_MATCH,
+              );
+            });
+        });
 
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.PASSWORD_TOO_SHORT,
-          );
+        it("→ should not allow to short password (under 8 characters)", async () => {
+          await request(app.getHttpServer())
+            .post(endpoint)
+            .send({
+              email: email6,
+              password: "123",
+              confirmPassword: "123",
+            })
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as unknown).message).toContain(
+                AuthErrors.PASSWORD_TOO_SHORT,
+              );
+            });
         });
       });
     });
@@ -144,6 +176,7 @@ describe("Auth features (e2e)", () => {
           .send({
             email: email1,
             password,
+            confirmPassword: password,
           })
           .expect(409);
       });
@@ -154,6 +187,7 @@ describe("Auth features (e2e)", () => {
           .send({
             email: email1,
             password,
+            confirmPassword: password,
           });
 
         expect((response.body as ConflictException).message).toBe(
@@ -197,15 +231,17 @@ describe("Auth features (e2e)", () => {
       });
 
       it("→ should return user info without sensitive fields (e.g. password)", async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .post(endpoint)
           .send({
             email: email1,
             password,
           })
-          .expect(201);
-
-        expect(response.body).not.toHaveProperty("password");
+          .expect(201)
+          .expect((res) => {
+            expect(res.body).not.toHaveProperty("password");
+            expect(res.body).not.toHaveProperty("confirmPassword");
+          });
       });
     });
 
