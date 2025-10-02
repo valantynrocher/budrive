@@ -1,6 +1,7 @@
 import { AppModule } from "@/app.module";
 import { SignUpDto } from "@/auth/auth.dto";
 import { AuthErrors } from "@/common/errors";
+import { MailService } from "@/mail/mail.service";
 import { PrismaService } from "@/prisma/prisma.service";
 import {
   ConflictException,
@@ -13,7 +14,8 @@ import { App } from "supertest/types";
 
 describe("Auth features (e2e)", () => {
   let app: INestApplication<App>;
-  const prisma = new PrismaService();
+  let prisma: PrismaService;
+  let mailService: MailService;
 
   const [email1, email2, email3, email4, email5, email6] = Array.from(
     Array(10).keys(),
@@ -34,7 +36,11 @@ describe("Auth features (e2e)", () => {
         transform: true,
       }),
     );
+
     await app.init();
+
+    prisma = app.get(PrismaService);
+    mailService = app.get(MailService);
   });
 
   afterAll(async () => {
@@ -86,6 +92,26 @@ describe("Auth features (e2e)", () => {
             expect(res.body).not.toHaveProperty("confirmPassword");
           });
       });
+
+      it("should send a confirmation email after signup", async () => {
+        const spy = jest
+          .spyOn(mailService, "sendEmailConfirmation")
+          .mockResolvedValue();
+
+        await request(app.getHttpServer())
+          .post(endpoint)
+          .send({
+            email: email4,
+            password,
+            confirmPassword: password,
+          })
+          .expect(201);
+
+        expect(spy).toHaveBeenCalledWith(
+          email4,
+          expect.any(String), // le token
+        );
+      });
     });
 
     describe("Validation errors", () => {
@@ -98,9 +124,7 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect((res.body as unknown).message).toContain(
-                AuthErrors.EMAIL_REQUIRED,
-              );
+              expect(res.body.message).toContain(AuthErrors.EMAIL_REQUIRED);
             });
         });
 
@@ -113,9 +137,7 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect((res.body as unknown).message).toContain(
-                AuthErrors.EMAIL_INVALID,
-              );
+              expect(res.body.message).toContain(AuthErrors.EMAIL_INVALID);
             });
         });
       });
@@ -129,9 +151,7 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect((res.body as unknown).message).toContain(
-                AuthErrors.PASSWORD_REQUIRED,
-              );
+              expect(res.body.message).toContain(AuthErrors.PASSWORD_REQUIRED);
             });
         });
 
@@ -145,7 +165,7 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect((res.body as unknown).message).toContain(
+              expect(res.body.message).toContain(
                 AuthErrors.CONFIRM_PASSWORD_NOT_MATCH,
               );
             });
@@ -161,9 +181,7 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect((res.body as unknown).message).toContain(
-                AuthErrors.PASSWORD_TOO_SHORT,
-              );
+              expect(res.body.message).toContain(AuthErrors.PASSWORD_TOO_SHORT);
             });
         });
       });
@@ -198,6 +216,81 @@ describe("Auth features (e2e)", () => {
 
     describe("Security considerations", () => {
       //  TODO, but not yet
+    });
+  });
+
+  describe("POST /auth/confirm", () => {
+    const endpoint = "/auth/confirm";
+
+    describe("Success cases", () => {
+      it("→ should confirm the user and return a JWT when token is valid", async () => {
+        const userToVerify = await prisma.user.findUnique({
+          where: { email: email1 },
+        });
+
+        if (!userToVerify) {
+          fail("userToVerify has not been found in the database");
+        }
+
+        const tokenRecord = await prisma.emailVerificationToken.findFirst({
+          where: { userId: userToVerify.id },
+        });
+
+        if (!tokenRecord) {
+          fail("tokenRecord for the user has not been found in the database");
+        }
+
+        const confirmRes = await request(app.getHttpServer())
+          .post(endpoint)
+          .send({ token: tokenRecord.token })
+          .expect(201);
+
+        expect(confirmRes.body).toHaveProperty("accessToken");
+
+        // 4. vérifier que user est bien isVerified en DB
+        const user = await prisma.user.findUnique({
+          where: { id: userToVerify.id },
+        });
+        expect(user?.isVerified).toBe(true);
+      });
+    });
+
+    describe("Error cases", () => {
+      it("→ should fail if token is invalid", async () => {
+        const res = await request(app.getHttpServer())
+          .post("/auth/confirm")
+          .send({ token: "not-a-real-token" })
+          .expect(400);
+
+        expect(res.body.message).toMatch(AuthErrors.TOKEN_INVALID_EXPIRED);
+      });
+
+      it("→ should fail if token is expired", async () => {
+        const userToVerify = await prisma.user.findUnique({
+          where: {
+            email: email2,
+          },
+        });
+
+        if (!userToVerify) {
+          fail("userToVerify has not been found in the database");
+        }
+
+        // 2. récup token généré en DB
+        const expiredTokenRecord = await prisma.emailVerificationToken.update({
+          where: { userId: userToVerify.id },
+          data: {
+            expiresAt: new Date(Date.now() - 1000),
+          },
+        });
+
+        const res = await request(app.getHttpServer())
+          .post("/auth/confirm")
+          .send({ token: expiredTokenRecord.token })
+          .expect(400);
+
+        expect(res.body.message).toMatch(AuthErrors.TOKEN_INVALID_EXPIRED);
+      });
     });
   });
 

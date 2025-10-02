@@ -33,3 +33,10 @@ export class SignUpDto extends AuthCredentialsDto {
 }
 
 export class SignInDto extends AuthCredentialsDto {}
+
+export class ConfirmDto {
+  @IsNotEmpty({
+    message: AuthErrors.TOKEN_REQUIRED,
+  })
+  token: string;
+}

@@ -6,6 +6,8 @@ export const AuthErrors = {
   CONFIRM_PASSWORD_NOT_MATCH: "Les deux mots de passe ne correspondent pas",
   INVALID_CREDENTIALS: "L'e-mail et/ou le mot de passe sont incorrects",
   EMAIL_ALREADY_EXISTS: "Cet e-mail est déjà utilisé par un utilisateur",
+  TOKEN_REQUIRED: "Le token est obligatoire",
+  TOKEN_INVALID_EXPIRED: "Le token est invalide ou a expiré",
 } as const;
 
 export type AuthErrorKey = keyof typeof AuthErrors;

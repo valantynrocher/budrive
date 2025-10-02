@@ -4,6 +4,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { PrismaModule } from "./prisma/prisma.module";
+import { EmailVerificationTokensModule } from './email-verification-tokens/email-verification-tokens.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     }),
     PrismaModule,
     AuthModule,
+    EmailVerificationTokensModule,
   ],
   controllers: [AppController],
   providers: [AppService],

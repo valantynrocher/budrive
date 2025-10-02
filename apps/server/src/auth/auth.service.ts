@@ -8,13 +8,17 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { UsersService } from "../users/users.service";
-import { SignInDto, SignUpDto } from "./auth.dto";
+import { ConfirmDto, SignInDto, SignUpDto } from "./auth.dto";
+import { MailService } from "@/mail/mail.service";
+import { EmailVerificationTokensService } from "@/email-verification-tokens/email-verification-tokens.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+    private readonly emailVerificationService: EmailVerificationTokensService,
   ) {}
 
   async signUp(credentials: SignUpDto) {
@@ -37,9 +41,32 @@ export class AuthService {
       fullName: credentials?.fullName,
     });
 
+    const { token } = await this.emailVerificationService.createForUser(
+      user.id,
+    );
+
+    await this.mailService.sendEmailConfirmation(user.email, token);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash: _ph, ...safeUser } = user;
     return safeUser;
+  }
+
+  async confirm(payload: ConfirmDto) {
+    const record = await this.emailVerificationService.findByToken(
+      payload.token,
+    );
+    if (!record || record.expiresAt < new Date()) {
+      throw new BadRequestException(AuthErrors.TOKEN_INVALID_EXPIRED);
+    }
+
+    const user = await this.usersService.verifyUser(record.userId);
+
+    await this.emailVerificationService.deleteById(record.id);
+
+    const accessToken = this.jwtService.sign({ sub: user.id });
+
+    return { accessToken };
   }
 
   async signIn(credentials: SignInDto) {

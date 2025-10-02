@@ -24,6 +24,13 @@ export class UsersService {
     });
   }
 
+  async verifyUser(id: User["id"]): Promise<User> {
+    return this.prisma.user.update({
+      where: { id },
+      data: { isVerified: true },
+    });
+  }
+
   async findAll() {
     return this.prisma.user.findMany();
   }
