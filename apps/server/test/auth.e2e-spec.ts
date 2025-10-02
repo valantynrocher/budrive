@@ -11,6 +11,7 @@ import {
 import { Test, TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { App } from "supertest/types";
+import { ErrorResponse } from "test/types/error-response";
 
 describe("Auth features (e2e)", () => {
   let app: INestApplication<App>;
@@ -94,9 +95,7 @@ describe("Auth features (e2e)", () => {
       });
 
       it("should send a confirmation email after signup", async () => {
-        const spy = jest
-          .spyOn(mailService, "sendEmailConfirmation")
-          .mockResolvedValue();
+        const spy = jest.spyOn(mailService, "sendEmailConfirmation");
 
         await request(app.getHttpServer())
           .post(endpoint)
@@ -124,7 +123,9 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect(res.body.message).toContain(AuthErrors.EMAIL_REQUIRED);
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.EMAIL_REQUIRED,
+              );
             });
         });
 
@@ -137,7 +138,9 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect(res.body.message).toContain(AuthErrors.EMAIL_INVALID);
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.EMAIL_INVALID,
+              );
             });
         });
       });
@@ -151,7 +154,9 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect(res.body.message).toContain(AuthErrors.PASSWORD_REQUIRED);
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.PASSWORD_REQUIRED,
+              );
             });
         });
 
@@ -165,7 +170,7 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect(res.body.message).toContain(
+              expect((res.body as ErrorResponse).message).toContain(
                 AuthErrors.CONFIRM_PASSWORD_NOT_MATCH,
               );
             });
@@ -181,7 +186,9 @@ describe("Auth features (e2e)", () => {
             })
             .expect(400)
             .expect((res) => {
-              expect(res.body.message).toContain(AuthErrors.PASSWORD_TOO_SHORT);
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.PASSWORD_TOO_SHORT,
+              );
             });
         });
       });
@@ -262,7 +269,9 @@ describe("Auth features (e2e)", () => {
           .send({ token: "not-a-real-token" })
           .expect(400);
 
-        expect(res.body.message).toMatch(AuthErrors.TOKEN_INVALID_EXPIRED);
+        expect((res.body as ErrorResponse).message).toMatch(
+          AuthErrors.TOKEN_INVALID_EXPIRED,
+        );
       });
 
       it("→ should fail if token is expired", async () => {
@@ -289,7 +298,9 @@ describe("Auth features (e2e)", () => {
           .send({ token: expiredTokenRecord.token })
           .expect(400);
 
-        expect(res.body.message).toMatch(AuthErrors.TOKEN_INVALID_EXPIRED);
+        expect((res.body as ErrorResponse).message).toMatch(
+          AuthErrors.TOKEN_INVALID_EXPIRED,
+        );
       });
     });
   });
@@ -318,7 +329,8 @@ describe("Auth features (e2e)", () => {
           .expect(201);
 
         expect(response.body).toHaveProperty("accessToken");
-        const token = response.body.accessToken as unknown;
+        const token = (response.body as { accessToken: string })
+          .accessToken as unknown;
         expect(typeof token).toBe("string");
         expect((token as string).split(".")).toHaveLength(3);
       });
@@ -341,58 +353,64 @@ describe("Auth features (e2e)", () => {
     describe("Validation errors", () => {
       describe("email field", () => {
         it("→ should not allow missing email", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               password,
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.EMAIL_REQUIRED,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.EMAIL_REQUIRED,
+              );
+            });
         });
 
         it("→ should not allow invalid email format", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               email: "testuser@example",
               password,
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.EMAIL_INVALID,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.EMAIL_INVALID,
+              );
+            });
         });
       });
 
       describe("password field", () => {
         it("→ should not allow missing password", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               email: email1,
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.PASSWORD_REQUIRED,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.PASSWORD_REQUIRED,
+              );
+            });
         });
 
         it("→ should not allow to short password (under 8 characters)", async () => {
-          const response = await request(app.getHttpServer())
+          await request(app.getHttpServer())
             .post(endpoint)
             .send({
               email: email1,
+              password: "123",
+              confirmPassword: "123",
             })
-            .expect(400);
-
-          expect((response.body as unknown).message).toContain(
-            AuthErrors.PASSWORD_TOO_SHORT,
-          );
+            .expect(400)
+            .expect((res) => {
+              expect((res.body as ErrorResponse).message).toContain(
+                AuthErrors.PASSWORD_TOO_SHORT,
+              );
+            });
         });
       });
     });
@@ -427,7 +445,9 @@ describe("Auth features (e2e)", () => {
           })
           .expect(401);
 
-        expect(response.body.message).toBe(AuthErrors.INVALID_CREDENTIALS);
+        expect((response.body as ErrorResponse).message).toBe(
+          AuthErrors.INVALID_CREDENTIALS,
+        );
       });
     });
 
