@@ -1,5 +1,4 @@
 "use client";
-import { emailSchema, EmailValue } from "@/utils/zod/auth";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import TextField from "@mui/material/TextField";
@@ -11,16 +10,16 @@ import React, {
 } from "react";
 import { EmailFormControlProps } from "./props";
 
-type EmailFormControlError = EmailValue | undefined;
+type EmailFormControlError = string | undefined;
 
 export type EmailFormControlRef = {
-  getValue: () => EmailValue;
+  getValue: () => string;
   getError: () => EmailFormControlError;
 };
 
 const EmailFormControl = forwardRef<EmailFormControlRef, EmailFormControlProps>(
   (_, ref) => {
-    const [value, setValue] = useState<EmailValue>("");
+    const [value, setValue] = useState<string>("");
     const [error, setError] = useState<EmailFormControlError>();
     const hasError = Boolean(error);
 
@@ -33,10 +32,7 @@ const EmailFormControl = forwardRef<EmailFormControlRef, EmailFormControlProps>(
       setValue(event.target.value);
     };
 
-    const handleBlur = useCallback(() => {
-      const result = emailSchema.safeParse(value);
-      setError(result.success ? undefined : result.error.issues[0].message);
-    }, [value]);
+    const handleBlur = useCallback(() => {}, [value]);
 
     return (
       <FormControl>

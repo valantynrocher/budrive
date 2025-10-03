@@ -7,7 +7,7 @@ import {
   SignInSchema,
   type SignUpDto,
   SignUpSchema,
-} from "./auth.dto";
+} from "@budrive/validation";
 import { AuthService } from "./auth.service";
 
 @Controller("auth")

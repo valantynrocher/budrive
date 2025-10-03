@@ -1,5 +1,6 @@
-import { AuthErrors } from "@/common/errors";
+import { AuthErrors } from "./errors";
 import { z } from "zod";
+import { passwordSchema } from "./utils";
 
 /**
  * AuthCredentials
@@ -11,12 +12,7 @@ export const AuthCredentialsSchema = z.object({
     })
     .min(1, AuthErrors.EMAIL_REQUIRED)
     .email(AuthErrors.EMAIL_INVALID),
-  password: z
-    .string({
-      required_error: AuthErrors.PASSWORD_REQUIRED,
-    })
-    .min(1, AuthErrors.PASSWORD_REQUIRED)
-    .min(8, AuthErrors.PASSWORD_TOO_SHORT),
+  password: passwordSchema,
 });
 
 export type AuthCredentialsDto = z.infer<typeof AuthCredentialsSchema>;
@@ -25,12 +21,7 @@ export type AuthCredentialsDto = z.infer<typeof AuthCredentialsSchema>;
  * SignUp
  */
 export const SignUpSchema = AuthCredentialsSchema.extend({
-  confirmPassword: z
-    .string({
-      required_error: AuthErrors.CONFIRM_PASSWORD_REQUIRED,
-    })
-    .min(1, AuthErrors.CONFIRM_PASSWORD_REQUIRED)
-    .min(8, AuthErrors.PASSWORD_TOO_SHORT),
+  confirmPassword: passwordSchema,
   fullName: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: AuthErrors.CONFIRM_PASSWORD_NOT_MATCH,

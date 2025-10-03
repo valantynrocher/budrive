@@ -1,6 +1,5 @@
 import { AppModule } from "@/app.module";
-import { SignUpDto } from "@/auth/auth.dto";
-import { AuthErrors } from "@/common/errors";
+import { SignUpDto, AuthErrors } from "@budrive/validation";
 import { MailService } from "@/mail/mail.service";
 import { PrismaService } from "@/prisma/prisma.service";
 import {

@@ -1,4 +1,9 @@
-import { AuthErrors } from "@/common/errors";
+import {
+  AuthErrors,
+  ConfirmDto,
+  SignInDto,
+  SignUpDto,
+} from "@budrive/validation";
 import {
   BadRequestException,
   ConflictException,
@@ -8,7 +13,6 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { UsersService } from "../users/users.service";
-import { ConfirmDto, SignInDto, SignUpDto } from "./auth.dto";
 import { MailService } from "@/mail/mail.service";
 import { EmailVerificationTokensService } from "@/email-verification-tokens/email-verification-tokens.service";
 

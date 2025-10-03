@@ -77,9 +77,6 @@ importers:
       uuid:
         specifier: ^11.1.0
         version: 11.1.0
-      zod:
-        specifier: ^3.25.56
-        version: 3.25.76
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -241,6 +238,8 @@ importers:
       typescript-eslint:
         specifier: ^8.20.0
         version: 8.44.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
+
+  packages/validation: {}
 
 packages:
 

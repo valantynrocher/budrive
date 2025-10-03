@@ -1,5 +1,4 @@
 "use client";
-import { type PasswordValues, passwordSchema } from "@/utils/zod/auth";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import FormControl from "@mui/material/FormControl";
@@ -16,6 +15,10 @@ import React, {
 } from "react";
 import { PasswordFormControlProps } from "./props";
 
+type PasswordValues = {
+  password: string;
+  confirmation?: string;
+};
 type PasswordFormControlErrors = Partial<Record<keyof PasswordValues, string>>;
 
 export type PasswordFormControlRef = {
@@ -51,24 +54,11 @@ const PasswordFormControl = forwardRef<
     setConfirmation(event.target.value);
   };
 
-  const handleBlur = useCallback(() => {
-    const result = passwordSchema.safeParse({ password, confirmation });
-    if (!result.success) {
-      const newErrors: Record<string, string> = {};
-      result.error.issues.forEach((err) => {
-        const field = err.path[0];
-        if (typeof field === "string") {
-          // In this case, we don't care about the confirmation's input validation
-          if (!withConfirm && field === "confirmation") return;
-
-          newErrors[field] = err.message;
-        }
-      });
-      setErrors(newErrors);
-    } else {
-      setErrors({});
-    }
-  }, [confirmation, password, withConfirm]);
+  const handleBlur = useCallback(() => {}, [
+    confirmation,
+    password,
+    withConfirm,
+  ]);
 
   const handleClickDisplay = () => {
     setDisplay((display) => !display);
