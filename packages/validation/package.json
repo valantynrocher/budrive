@@ -1,7 +1,27 @@
 {
   "name": "@budrive/validation",
-  "version": "0.0.1",
-  "main": "index.ts",
-  "types": "index.ts",
-  "license": "MIT"
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs", 
+      "require": "./dist/index.js"
+    },
+    "./auth": {
+      "import": "./dist/auth/index.mjs",
+      "require": "./dist/auth/index.js"
+    }
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  }
 }

@@ -25,6 +25,9 @@ apps/client/out/
 # NestJS
 apps/server/dist/
 
+#packages
+packages/*/dist/
+
 # Generic build folders
 build/
 temp/

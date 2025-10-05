@@ -1,8 +1,8 @@
 import {
   AuthErrors,
-  ConfirmDto,
-  SignInDto,
-  SignUpDto,
+  type ConfirmDto,
+  type SignInDto,
+  type SignUpDto,
 } from "@budrive/validation";
 import {
   BadRequestException,

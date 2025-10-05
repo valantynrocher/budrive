@@ -13,5 +13,9 @@
   "dependencies": {
     "turbo": "^2.5.8",
     "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.9.3"
   }
 }

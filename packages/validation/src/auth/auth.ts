@@ -1,6 +1,6 @@
-import { AuthErrors } from "./errors";
+import { AuthErrors } from "./errors.js";
 import { z } from "zod";
-import { passwordSchema } from "./utils";
+import { passwordSchema } from "./utils.js";
 
 /**
  * AuthCredentials

@@ -27,16 +27,15 @@
     "path-to-regexp": "^8.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "@budrive/validation": "workspace:*"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
-    "eslint-config-prettier": "^10.1.5",
-    "typescript": "^5"
+    "eslint-config-prettier": "^10.1.5"
   }
 }
