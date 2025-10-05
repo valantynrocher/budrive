@@ -1,14 +1,23 @@
 {
-  "globalSetup": "<rootDir>/jest-e2e-setup.ts",
+  "globalSetup": "./configs/jest-e2e-setup.ts",
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": "./",
-  "roots": ["<rootDir>/../test"],
+  "rootDir": "../",
+  "roots": ["<rootDir>/test"],
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": "./tsconfig.json",
+        "ignoreModuleExtensions": true
+      }
+    ]
   },
   "moduleNameMapper": {
-    "^@/(.*)$": "<rootDir>/../src/$1"
-  }
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(axios|supertest|class-transformer|@nestjs|@budrive))"
+  ]
 }

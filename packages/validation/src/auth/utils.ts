@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AuthErrors } from "./errors.js";
+import { AuthErrors } from "./errors";
 
 export const passwordSchema = z
   .string({

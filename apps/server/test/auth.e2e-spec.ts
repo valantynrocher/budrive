@@ -10,7 +10,12 @@ import {
 import { Test, TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { App } from "supertest/types";
-import { ErrorResponse } from "test/types/error-response";
+
+interface ErrorResponse {
+  statusCode: number;
+  message: string | string[];
+  error: string;
+}
 
 describe("Auth features (e2e)", () => {
   let app: INestApplication<App>;

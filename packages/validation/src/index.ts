@@ -1,2 +1,2 @@
-export * from "./auth/index.js";
-export * from "./zod.utils.js";
+export * from "./auth";
+export * from "./zod.utils";
