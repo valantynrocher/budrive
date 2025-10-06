@@ -1,33 +1,21 @@
 import SignInForm from "@/components/pages/auth/SignInForm";
+import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 
-const SignInPage = () => {
+const SignInPage = async ({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) => {
+  const { error } = await searchParams;
+  const decodedMessage = error ? decodeURIComponent(error) : null;
   return (
     <>
       <Typography component="h1" variant="h1" sx={{ width: "100%" }}>
         Connexion
       </Typography>
-      <SignInForm />
-      {/* 
-      <Divider>ou</Divider>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={() => alert("S'inscrire avec Google")}
-          startIcon={<GoogleIcon />}
-        >
-          S&apos;inscrire avec Google
-        </Button>
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={() => alert("S'inscrire avec Facebook")}
-          startIcon={<FacebookIcon />}
-        >
-          S&apos;inscrire avec Facebook
-        </Button> */}
+      <SignInForm urlError={decodedMessage} />
       <Typography sx={{ textAlign: "center" }}>
         Pas encore pas inscrit ?{" "}
         <Link
@@ -39,7 +27,6 @@ const SignInPage = () => {
           S&apos;enregistrer
         </Link>
       </Typography>
-      {/* </Box> */}
     </>
   );
 };

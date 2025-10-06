@@ -12,6 +12,7 @@
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
     "@mui/material-nextjs": "^7.1.0",
@@ -28,8 +29,8 @@
     "path-to-regexp": "^8.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "uuid": "^11.1.0",
-    "@budrive/validation": "workspace:*"
+    "react-hook-form": "^7.63.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

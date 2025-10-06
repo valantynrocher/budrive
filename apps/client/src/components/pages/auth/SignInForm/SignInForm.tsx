@@ -5,23 +5,20 @@ import PasswordFormControl, {
   PasswordFormControlRef,
 } from "@/components/pages/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
-import translateErrorCode from "@/utils/supabase/error-translation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const translateAuthErrorCode = translateErrorCode("auth");
-
-const SignInForm = () => {
+const SignInForm = (props: { urlError: string | null }) => {
   const emailRef = useRef<EmailFormControlRef>(null);
   const passwordRef = useRef<PasswordFormControlRef>(null);
 
   const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(props.urlError);
 
   const handleErrorClose = () => {
-    setServerError(null);
+    setError(null);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -45,7 +42,7 @@ const SignInForm = () => {
 
     // No client error : perform server action
     setLoading(true);
-    setServerError(null);
+    setError(null);
   };
 
   return (
@@ -65,7 +62,7 @@ const SignInForm = () => {
         {loading ? <CircularProgress size={24} /> : "Se connecter"}
       </Button>
 
-      <ErrorSnackbar message={serverError} onClose={handleErrorClose} />
+      <ErrorSnackbar message={error} onClose={handleErrorClose} />
     </Box>
   );
 };

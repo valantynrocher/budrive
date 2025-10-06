@@ -7,7 +7,10 @@ export const AuthErrors = {
   INVALID_CREDENTIALS: "L'e-mail et/ou le mot de passe sont incorrects",
   EMAIL_ALREADY_EXISTS: "Cet e-mail est déjà utilisé par un utilisateur",
   TOKEN_REQUIRED: "Le token est obligatoire",
-  TOKEN_INVALID_EXPIRED: "Le token est invalide ou a expiré",
+  TOKEN_INVALID_EXPIRED: "Ce lien n'est plus valide",
+  URL_CONFIRM_TOKEN_MISSING: "Le lien de confirmation n'est pas valide",
+  CONFIRM_TOKEN_UNKNOW_ERROR:
+    "Une erreur est survenue lors de la confirmation d'inscription. Veuillez réessayer ultérieurement",
 } as const;
 
 export type AuthErrorKey = keyof typeof AuthErrors;

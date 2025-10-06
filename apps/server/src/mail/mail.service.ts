@@ -53,7 +53,7 @@ export class MailService implements OnModuleInit {
       throw new Error("Mail transporter is not initialized");
     }
 
-    const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:3000";
+    const frontendUrl = process.env.FRONTEND_URL ?? "https://localhost:3000";
     const link = `${frontendUrl}/auth/confirm?token=${encodeURIComponent(token)}`;
 
     const mailOptions: nodemailer.SendMailOptions = {

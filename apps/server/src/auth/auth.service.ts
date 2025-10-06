@@ -70,7 +70,7 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign({ sub: user.id });
 
-    return { accessToken };
+    return accessToken;
   }
 
   async signIn(credentials: SignInDto) {
