@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@budrive/validation": "workspace:*",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -36,6 +37,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
-    "eslint-config-prettier": "^10.1.5"
+    "eslint-config-prettier": "^10.1.5",
+    "postcss": "^8.5.6",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^10.4.0"
   }
 }
