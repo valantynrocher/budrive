@@ -25,6 +25,33 @@ export class AuthService {
     private readonly emailVerificationService: EmailVerificationTokensService,
   ) {}
 
+  private async generateTokens(userId: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      // Access Token
+      this.jwtService.signAsync(
+        { sub: userId },
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
+      ),
+      // Refresh Token
+      this.jwtService.signAsync(
+        { sub: userId },
+        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
+      ),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+
+  // Hache le Refresh Token et le stocke en DB (pour comparaison ultérieure)
+  private async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+    await this.usersService.updatehashedRefreshToken(
+      userId,
+      hashedRefreshToken,
+    );
+  }
+
   async signUp(credentials: SignUpDto) {
     const existingUser = await this.usersService.findByEmail(credentials.email);
 
@@ -68,9 +95,10 @@ export class AuthService {
 
     await this.emailVerificationService.deleteById(record.id);
 
-    const accessToken = this.jwtService.sign({ sub: user.id });
+    const { accessToken, refreshToken } = await this.generateTokens(user.id);
+    await this.updateRefreshToken(user.id, refreshToken);
 
-    return accessToken;
+    return { accessToken, refreshToken };
   }
 
   async signIn(credentials: SignInDto) {
@@ -95,5 +123,40 @@ export class AuthService {
     };
     const token = this.jwtService.sign(payload);
     return { accessToken: token };
+  }
+
+  async refreshTokens(userId: string, oldRefreshToken: string) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user || !user.hashedRefreshToken) {
+      // Session révoquée ou jamais établie
+      throw new UnauthorizedException("Accès refusé. Session non trouvée.");
+    }
+
+    // 1. Comparaison du token reçu (oldRefreshToken) avec le hachage en DB
+    const isRefreshTokenValid = await bcrypt.compare(
+      oldRefreshToken,
+      user.hashedRefreshToken,
+    );
+
+    if (!isRefreshTokenValid) {
+      // Mesure de sécurité : Si le token est invalide, on révoque tous les tokens (faille)
+      await this.usersService.updatehashedRefreshToken(userId, null);
+      throw new UnauthorizedException("Token de rafraîchissement invalide.");
+    }
+
+    // 2. Génération de NOUVEAUX tokens
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+      await this.generateTokens(user.id);
+
+    // 3. Stockage du hachage du NOUVEAU Refresh Token (Rotation des Tokens)
+    await this.updateRefreshToken(user.id, newRefreshToken);
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  }
+
+  async logout(userId: string) {
+    // Supprimer le hachage du token pour révoquer la session
+    await this.usersService.updatehashedRefreshToken(userId, null);
   }
 }

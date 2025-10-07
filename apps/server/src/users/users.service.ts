@@ -6,6 +6,10 @@ import { PrismaService } from "../prisma/prisma.service";
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findById(id: User["id"]): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { email } });
   }
@@ -28,6 +32,16 @@ export class UsersService {
     return this.prisma.user.update({
       where: { id },
       data: { isVerified: true },
+    });
+  }
+
+  async updatehashedRefreshToken(
+    id: User["id"],
+    hashedRefreshToken: string | null,
+  ): Promise<User> {
+    return this.prisma.user.update({
+      where: { id },
+      data: { hashedRefreshToken },
     });
   }
 
