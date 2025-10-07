@@ -39,7 +39,6 @@ const SignUpFormComponent = () => {
 
   const onSubmit = async (data: FormData) => {
     setServerError(null);
-    console.log("SignUpFormComponent > onSubmit", data);
 
     try {
       await signupAction(data);
