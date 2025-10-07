@@ -11,6 +11,16 @@ export const AuthErrors = {
   URL_CONFIRM_TOKEN_MISSING: "Le lien de confirmation n'est pas valide",
   CONFIRM_TOKEN_UNKNOW_ERROR:
     "Une erreur est survenue lors de la confirmation d'inscription. Veuillez réessayer ultérieurement",
+  RESRESH_TOKEN_MISSING: "Refresh token manquant",
+  REFRESH_TOKEN_INVALID: "Format du refresh token invalide",
+  SESSION_EXPIRED_INVALID: "Session expirée ou invalide",
 } as const;
 
 export type AuthErrorKey = keyof typeof AuthErrors;
+
+export const AuthSuccess = {
+  USER_CONFIRMED: "Compte confirmé et utilisateur connecté",
+  LOGOUT: "Déconnexion réussie",
+};
+
+export type AuthSuccessKey = keyof typeof AuthSuccess;

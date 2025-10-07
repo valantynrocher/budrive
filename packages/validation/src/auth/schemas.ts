@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AuthErrors } from "./errors";
+import { AuthErrors } from "./messages";
 import { passwordSchema } from "./utils";
 
 /**

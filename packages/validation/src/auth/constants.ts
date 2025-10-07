@@ -1,6 +1,6 @@
 export const AuthToken = {
-  NAME: "access_token",
-  CONFIRM_SUCCESS: "Compte confirmé et utilisateur connecté",
+  ACCESS_TOKEN_COOKIE_NAME: "access_token",
+  REFRESH_TOKEN_COOKIE_NAME: "refresh_token",
 } as const;
 
 export type AuthTokenKey = keyof typeof AuthToken;
