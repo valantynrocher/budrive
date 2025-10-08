@@ -58,8 +58,19 @@ export class AuthController {
   }
 
   @Post("sign-in")
-  signIn(@Body(new ZodValidationPipe(SignInSchema)) signInDto: SignInDto) {
-    return this.authService.signIn(signInDto);
+  async signIn(
+    @Body(new ZodValidationPipe(SignInSchema)) signInDto: SignInDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken } =
+      await this.authService.signIn(signInDto);
+
+    setAuthCookies(res, accessToken, refreshToken);
+
+    return {
+      success: true,
+      message: AuthSuccess.SIGN_IN,
+    };
   }
 
   @Post("refresh")

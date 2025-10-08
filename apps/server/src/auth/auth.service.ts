@@ -117,12 +117,10 @@ export class AuthService {
       throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
     }
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-    };
-    const token = this.jwtService.sign(payload);
-    return { accessToken: token };
+    const { accessToken, refreshToken } = await this.generateTokens(user.id);
+    await this.updateRefreshToken(user.id, refreshToken);
+
+    return { accessToken, refreshToken };
   }
 
   async refreshTokens(userId: string, oldRefreshToken: string) {

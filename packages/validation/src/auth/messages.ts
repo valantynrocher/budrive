@@ -21,6 +21,7 @@ export type AuthErrorKey = keyof typeof AuthErrors;
 export const AuthSuccess = {
   USER_CONFIRMED: "Compte confirmé et utilisateur connecté",
   LOGOUT: "Déconnexion réussie",
+  SIGN_IN: "Connexion réussie",
 };
 
 export type AuthSuccessKey = keyof typeof AuthSuccess;
