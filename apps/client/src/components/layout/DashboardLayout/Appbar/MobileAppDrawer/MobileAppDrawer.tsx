@@ -1,6 +1,6 @@
+import useSession from "@/components/contexts/SessionContext/hooks/useSession";
 import NavigationMenu from "@/components/layout/DashboardLayout/NavigationMenu/NavigationMenu";
 import BudriveIcon from "@/components/ui/BudriveIcon";
-import LogoutButtonManager from "@/components/ui/LogoutButtonManager";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import { Toolbar } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -13,6 +13,8 @@ interface MobileAppDrawerProps {
 }
 
 const MobileAppDrawer = ({ open, toggleDrawer }: MobileAppDrawerProps) => {
+  const { logout } = useSession();
+
   return (
     <Drawer
       anchor="left"
@@ -39,18 +41,14 @@ const MobileAppDrawer = ({ open, toggleDrawer }: MobileAppDrawerProps) => {
         <NavigationMenu />
 
         <Stack sx={{ p: 2 }}>
-          <LogoutButtonManager
-            Component={({ onClick }) => (
-              <Button
-                onClick={onClick}
-                variant="outlined"
-                fullWidth
-                startIcon={<LogoutRoundedIcon />}
-              >
-                Déconnexion
-              </Button>
-            )}
-          />
+          <Button
+            onClick={logout}
+            variant="outlined"
+            fullWidth
+            startIcon={<LogoutRoundedIcon />}
+          >
+            Déconnexion
+          </Button>
         </Stack>
       </Stack>
     </Drawer>

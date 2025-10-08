@@ -1,22 +1,24 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
 import SessionContext from "./SessionContext";
+import { useRouter } from "next/navigation";
 
 const REFRESH_CHECK_INTERVAL_MS = 60 * 1000;
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+if (!BACKEND_URL) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL non configuré.");
+}
+
 const SessionProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  if (!BACKEND_URL) {
-    console.error(
-      "Erreur SessionProvider: NEXT_PUBLIC_BACKEND_URL non configuré."
-    );
-  }
+  const router = useRouter();
+  const UNIDENTIFIED_REDIRECT_URL = "/auth/sign-in";
 
   const refreshSession = async () => {
     try {
+      // We use our internal route handler as proxy
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_APP_URL!}/api/auth/refresh`,
         {
@@ -38,8 +40,6 @@ const SessionProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    if (!BACKEND_URL) return;
-
     try {
       await fetch(`${BACKEND_URL}/auth/logout`, {
         method: "POST",
@@ -49,6 +49,7 @@ const SessionProvider = ({ children }: { children: ReactNode }) => {
       console.error("Session Provider > Échec du logout", e);
     } finally {
       setIsAuthenticated(false);
+      return true;
     }
   };
 
@@ -61,6 +62,12 @@ const SessionProvider = ({ children }: { children: ReactNode }) => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      router.replace(UNIDENTIFIED_REDIRECT_URL);
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   return (
     <SessionContext.Provider value={{ isAuthenticated, isLoading, logout }}>

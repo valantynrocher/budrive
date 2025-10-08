@@ -1,8 +1,8 @@
+import useSession from "@/components/contexts/SessionContext/hooks/useSession";
 import UserManager from "@/components/layout/DashboardLayout/Appbar/UserManager";
 import { DRAWER_WIDTH } from "@/components/layout/DashboardLayout/constants";
 import BudriveIcon from "@/components/ui/BudriveIcon";
 import ColorModeManager from "@/components/ui/ColorModeManager";
-import LogoutButtonManager from "@/components/ui/LogoutButtonManager";
 import MenuButton from "@/components/ui/MenuButton";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
@@ -14,6 +14,7 @@ import MobileAppDrawer from "./MobileAppDrawer";
 
 const Appbar = () => {
   const [open, setOpen] = useState(false);
+  const { logout } = useSession();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -83,26 +84,22 @@ const Appbar = () => {
 
           <UserManager />
 
-          <LogoutButtonManager
-            Component={({ onClick }) => (
-              <MenuButton
-                aria-label="menu"
-                sx={{
-                  bgcolor: "error.main",
-                  color: "error.dark",
-                  borderRadius: 1,
-                  p: 1,
-                  "&:hover": { backgroundColor: "error.dark" },
-                }}
-                onClick={onClick}
-              >
-                <LogoutRoundedIcon
-                  fontSize="small"
-                  sx={{ "&:hover": { color: "error.light" } }}
-                />
-              </MenuButton>
-            )}
-          />
+          <MenuButton
+            aria-label="menu"
+            sx={{
+              bgcolor: "error.main",
+              color: "error.dark",
+              borderRadius: 1,
+              p: 1,
+              "&:hover": { backgroundColor: "error.dark" },
+            }}
+            onClick={logout}
+          >
+            <LogoutRoundedIcon
+              fontSize="small"
+              sx={{ "&:hover": { color: "error.light" } }}
+            />
+          </MenuButton>
         </Stack>
 
         <MobileAppDrawer open={open} toggleDrawer={toggleDrawer} />
