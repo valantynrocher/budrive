@@ -1,4 +1,5 @@
 "use server";
+import config from "@/lib/api/config";
 import { SignUpSchema } from "@budrive/validation";
 import { redirect } from "next/navigation";
 
@@ -6,9 +7,7 @@ type SignupActionResult =
   | { success: true }
   | { success: false; fieldErrors?: Record<string, string>; message?: string };
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-export async function signupAction(
+async function signupServerAction(
   formData: FormData
 ): Promise<SignupActionResult> {
   const parsed = SignUpSchema.safeParse(formData);
@@ -23,13 +22,7 @@ export async function signupAction(
     return { success: false, fieldErrors };
   }
 
-  if (!BACKEND_URL) {
-    throw new Error(
-      "Erreur de configuration: NEXT_PUBLIC_BACKEND_URL non défini."
-    );
-  }
-
-  const res = await fetch(`${BACKEND_URL}/auth/sign-up`, {
+  const res = await fetch(`${config.backendUrl}/auth/sign-up`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parsed.data),
@@ -38,12 +31,15 @@ export async function signupAction(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    return {
+    const response: SignupActionResult = {
       success: false,
       fieldErrors: body.fieldErrors,
       message: body.message ?? "Inscription échouée",
     };
+    return response;
   }
 
   redirect("/auth/check-email");
 }
+
+export default signupServerAction;

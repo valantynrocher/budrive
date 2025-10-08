@@ -1,13 +1,9 @@
 "use client";
-import { EmailFormControlRef } from "@/components/pages/auth/EmailFormControl/EmailFormControl";
-import { PasswordFormControlRef } from "@/components/pages/auth/PasswordFormControl/PasswordFormControl";
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
-import { signupAction } from "@/lib/api/auth";
 import { type SignUpDto, SignUpSchema } from "@budrive/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -17,16 +13,13 @@ import FormLabel from "@mui/material/FormLabel";
 import IconButton from "@mui/material/IconButton";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import TextField from "@mui/material/TextField";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import signupServerAction from "./signupServerAction";
 
 const SignUpFormComponent = () => {
-  const emailRef = useRef<EmailFormControlRef>(null);
-  const passwordRef = useRef<PasswordFormControlRef>(null);
-
-  const [serverError, setServerError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [display, setDisplay] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -38,31 +31,21 @@ const SignUpFormComponent = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    setServerError(null);
+    setError(null);
 
-    try {
-      await signupAction(data);
-      setSuccess(true);
-    } catch (err: any) {
-      setServerError(err.message);
+    const response = await signupServerAction(data);
+    if (!response.success && response.message) {
+      setError(response.message);
     }
   };
 
   const handleErrorClose = () => {
-    setServerError(null);
+    setError(null);
   };
 
-  const handleClickDisplay = () => {
-    setDisplay((display) => !display);
+  const handleClickShowPassword = () => {
+    setShowPassword((display) => !display);
   };
-
-  if (success) {
-    return (
-      <Alert severity="success">
-        Inscription réussie ! Vérifiez votre email pour confirmer votre compte.
-      </Alert>
-    );
-  }
 
   return (
     <>
@@ -72,7 +55,6 @@ const SignUpFormComponent = () => {
         noValidate
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
-        {/* <EmailFormControl ref={emailRef} /> */}
         <FormControl>
           <FormLabel htmlFor="email">E-mail</FormLabel>
           <TextField
@@ -90,13 +72,11 @@ const SignUpFormComponent = () => {
           />
         </FormControl>
 
-        {/* <PasswordFormControl ref={passwordRef} withConfirm /> */}
-
         <FormControl>
           <FormLabel htmlFor="password">Mot de passe</FormLabel>
           <OutlinedInput
             label="Mot de passe"
-            type={display ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             {...register("password")}
             error={!!errors.password}
             color={Boolean(errors.password) ? "error" : "primary"}
@@ -108,14 +88,14 @@ const SignUpFormComponent = () => {
             endAdornment={
               <IconButton
                 aria-label={
-                  display
+                  showPassword
                     ? "Masquer le mot de passe"
                     : "Afficher le mot de passe"
                 }
-                onClick={handleClickDisplay}
+                onClick={handleClickShowPassword}
                 edge="end"
               >
-                {display ? <VisibilityOff /> : <Visibility />}
+                {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             }
           />
@@ -129,7 +109,7 @@ const SignUpFormComponent = () => {
           </FormLabel>
           <OutlinedInput
             label="Mot de passe"
-            type={display ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             {...register("confirmPassword")}
             error={!!errors.confirmPassword}
             color={Boolean(errors.confirmPassword) ? "error" : "primary"}
@@ -141,14 +121,14 @@ const SignUpFormComponent = () => {
             endAdornment={
               <IconButton
                 aria-label={
-                  display
+                  showPassword
                     ? "Masquer le mot de passe"
                     : "Afficher le mot de passe"
                 }
-                onClick={handleClickDisplay}
+                onClick={handleClickShowPassword}
                 edge="end"
               >
-                {display ? <VisibilityOff /> : <Visibility />}
+                {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             }
           />
@@ -162,7 +142,7 @@ const SignUpFormComponent = () => {
         </Button>
       </Box>
 
-      <ErrorSnackbar message={serverError} onClose={handleErrorClose} />
+      <ErrorSnackbar message={error} onClose={handleErrorClose} />
     </>
   );
 };

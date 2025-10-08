@@ -2,13 +2,10 @@
 import { ReactNode, useEffect, useState } from "react";
 import SessionContext from "./SessionContext";
 import { useRouter } from "next/navigation";
+import config from "@/lib/api/config";
 
-const REFRESH_CHECK_INTERVAL_MS = 60 * 1000;
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-if (!BACKEND_URL) {
-  throw new Error("NEXT_PUBLIC_BACKEND_URL non configuré.");
-}
+// BASED ON 85% OF JWT_EXPIRES_IN
+const REFRESH_CHECK_INTERVAL_MS = 3060;
 
 const SessionProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,13 +16,10 @@ const SessionProvider = ({ children }: { children: ReactNode }) => {
   const refreshSession = async () => {
     try {
       // We use our internal route handler as proxy
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL!}/api/auth/refresh`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${config.appUrl}/api/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      });
 
       if (response.ok) {
         setIsAuthenticated(true);
@@ -41,7 +35,7 @@ const SessionProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch(`${BACKEND_URL}/auth/logout`, {
+      await fetch(`${config.backendUrl}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
