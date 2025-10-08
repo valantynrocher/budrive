@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-if (!BACKEND_URL) {
-  throw new Error("NEXT_PUBLIC_BACKEND_URL n'est pas configuré.");
-}
+import { config } from "@/utils/config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     // Transmet la requête du client au serveur NestJS
     const backendResponse = await fetch(
-      `${BACKEND_URL}/auth/refresh`,
+      `${config.backendUrl}/auth/refresh`,
       fetchOptions
     );
 

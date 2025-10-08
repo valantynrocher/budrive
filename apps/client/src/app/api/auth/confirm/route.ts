@@ -1,23 +1,16 @@
+import { config } from "@/utils/config";
+import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import parseSetCookie from "set-cookie-parser";
-import { cookies } from "next/headers";
-import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 type SameSiteType = ResponseCookie["sameSite"];
-
-if (!BACKEND_URL) {
-  throw new Error(
-    "Erreur de configuration: NEXT_PUBLIC_BACKEND_URL non défini."
-  );
-}
 
 export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();
 
-    const backendResponse = await fetch(`${BACKEND_URL}/auth/confirm`, {
+    const backendResponse = await fetch(`${config.backendUrl}/auth/confirm`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
