@@ -49,3 +49,19 @@ export const ForgotPwdSchema = z.object({
 });
 
 export type ForgotPwdDto = z.infer<typeof ForgotPwdSchema>;
+
+/**
+ * ResetPassword
+ */
+export const ResetPwdSchema = z
+  .object({
+    token: z.string().nonempty(AuthErrors.TOKEN_REQUIRED),
+    password: passwordValidation,
+    confirmPassword: passwordValidation,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: AuthErrors.CONFIRM_PASSWORD_NOT_MATCH,
+    path: ["confirmPassword"],
+  });
+
+export type ResetPwdDto = z.infer<typeof ResetPwdSchema>;

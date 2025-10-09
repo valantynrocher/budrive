@@ -14,6 +14,11 @@ export const AuthErrors = {
   RESRESH_TOKEN_MISSING: "Refresh token manquant",
   REFRESH_TOKEN_INVALID: "Format du refresh token invalide",
   SESSION_EXPIRED_INVALID: "Session expirée ou invalide",
+  RESET_PWD_TOKEN_NO_FOUND: "Jeton de réinitialisation invalide ou expiré",
+  URL_RESET_PWD_TOKEN_MISSING:
+    "Le lien de réinitialisation du mot de passe n'est pas valide",
+  CHECK_RESET_PWD_TOKEN_UNKNOW_ERROR:
+    "Une erreur est survenue lors de la vérification du jeton. Veuillez réessayer ultérieurement",
 } as const;
 
 export type AuthErrorKey = keyof typeof AuthErrors;
