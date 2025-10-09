@@ -1,6 +1,6 @@
 "use client";
 import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
-import { type SignUpDto, SignUpSchema } from "@budrive/validation";
+import { type ResetPwdDto, ResetPwdSchema } from "@budrive/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -12,12 +12,12 @@ import FormHelperText from "@mui/material/FormHelperText";
 import FormLabel from "@mui/material/FormLabel";
 import IconButton from "@mui/material/IconButton";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import signupServerAction from "./signupServerAction";
+import { ResetPasswordFormProps } from "./props";
+import resetPwdServerAction from "./resetPwdServerAction";
 
-const SignUpFormComponent = () => {
+const ResetPasswordFormComponent = ({ token }: ResetPasswordFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -25,15 +25,17 @@ const SignUpFormComponent = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpDto>({
-    resolver: zodResolver(SignUpSchema),
+  } = useForm<ResetPwdDto>({
+    resolver: zodResolver(ResetPwdSchema),
     mode: "onBlur",
   });
 
   const onSubmit = async (data: FormData) => {
     setError(null);
 
-    const response = await signupServerAction(data);
+    console.log("ResetPasswordFormComponent > onSubmit", data);
+
+    const response = await resetPwdServerAction(data, token);
     if (!response.success && response.message) {
       setError(response.message);
     }
@@ -55,27 +57,11 @@ const SignUpFormComponent = () => {
         noValidate
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
+        <input hidden {...register("token")} value={token} />
         <FormControl>
-          <FormLabel htmlFor="email">E-mail</FormLabel>
-          <TextField
-            type="email"
-            {...register("email")}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-            color={Boolean(errors.email) ? "error" : "primary"}
-            //
-            variant="outlined"
-            autoComplete="email"
-            autoFocus
-            fullWidth
-            placeholder="your@email.com"
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel htmlFor="password">Mot de passe</FormLabel>
+          <FormLabel htmlFor="password">Nouveau mot de passe</FormLabel>
           <OutlinedInput
-            label="Mot de passe"
+            label="Nouveau mot de passe"
             type={showPassword ? "text" : "password"}
             {...register("password")}
             error={!!errors.password}
@@ -138,7 +124,7 @@ const SignUpFormComponent = () => {
         </FormControl>
 
         <Button type="submit" fullWidth variant="contained">
-          {isSubmitting ? <CircularProgress size={24} /> : "S'inscrire"}
+          {isSubmitting ? <CircularProgress size={24} /> : "Envoyer"}
         </Button>
       </Box>
 
@@ -147,4 +133,4 @@ const SignUpFormComponent = () => {
   );
 };
 
-export default SignUpFormComponent;
+export default ResetPasswordFormComponent;

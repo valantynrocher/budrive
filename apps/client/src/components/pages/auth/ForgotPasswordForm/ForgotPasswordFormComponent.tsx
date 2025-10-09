@@ -53,8 +53,8 @@ const ForgotPasswordFormComponent = () => {
     >
       {state && state.success ? (
         <Alert severity="success">
-          Si cet email existe, vous recevrez un lien pour réinitialiser votre
-          mot de passe.
+          Si cet e-mail est associé à un compte utilisateur, vous recevrez un
+          lien pour réinitialiser votre mot de passe.
         </Alert>
       ) : (
         <>
