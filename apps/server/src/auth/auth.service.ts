@@ -3,6 +3,7 @@ import { MailService } from "@/mail/mail.service";
 import { PasswordResetTokenService } from "@/password-reset-token/password-reset-token.service";
 import {
   AuthErrors,
+  ResetPwdDto,
   type ConfirmDto,
   type ForgotPwdDto,
   type SignInDto,
@@ -17,6 +18,7 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { UsersService } from "../users/users.service";
+import { PrismaService } from "@/prisma/prisma.service";
 
 @Injectable()
 export class AuthService {
@@ -26,6 +28,7 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly emailVerificationService: EmailVerificationTokensService,
     private readonly passwordResetService: PasswordResetTokenService,
+    private readonly prisma: PrismaService,
   ) {}
 
   private async generateTokens(userId: string) {
@@ -55,6 +58,17 @@ export class AuthService {
     );
   }
 
+  private async createPasswordHash(password: string, confirmPassword: string) {
+    if (password !== confirmPassword) {
+      throw new BadRequestException(AuthErrors.CONFIRM_PASSWORD_NOT_MATCH);
+    }
+
+    const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+    return passwordHash;
+  }
+
   async signUp(credentials: SignUpDto) {
     const existingUser = await this.usersService.findByEmail(credentials.email);
 
@@ -62,12 +76,10 @@ export class AuthService {
       throw new ConflictException(AuthErrors.EMAIL_ALREADY_EXISTS);
     }
 
-    if (credentials.password !== credentials.confirmPassword) {
-      throw new BadRequestException(AuthErrors.CONFIRM_PASSWORD_NOT_MATCH);
-    }
-
-    const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
-    const passwordHash = await bcrypt.hash(credentials.password, SALT_ROUNDS);
+    const passwordHash = await this.createPasswordHash(
+      credentials.password,
+      credentials.confirmPassword,
+    );
 
     const user = await this.usersService.create({
       email: credentials.email,
@@ -173,12 +185,55 @@ export class AuthService {
       user.id,
     );
 
-    // 2. Création du lien
-    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${tokenValue}`;
-
     // 3. Envoi de l'email
-    await this.mailService.sendPasswordReset(user.email, resetLink);
+    await this.mailService.sendPasswordReset(user.email, tokenValue);
 
     return;
+  }
+
+  async verifyResetToken(token: string) {
+    await this.passwordResetService.validateToken(token);
+
+    return;
+  }
+
+  async resetPassword(credentials: ResetPwdDto) {
+    const resetToken = await this.passwordResetService.validateToken(
+      credentials.token,
+    );
+
+    const passwordHash = await this.createPasswordHash(
+      credentials.password,
+      credentials.confirmPassword,
+    );
+
+    let updatedUser;
+
+    try {
+      // 3. Exécution de la Transaction
+      await this.prisma.$transaction(async (tx) => {
+        updatedUser = await tx.user.update({
+          where: { id: resetToken.userId },
+          data: { passwordHash: passwordHash },
+        });
+
+        await tx.passwordResetToken.delete({
+          where: { id: resetToken.id },
+        });
+      });
+
+      // 4. Actions Post-Transaction (Si tout a réussi)
+      await this.mailService.sendPasswordResetConfirm(updatedUser.email);
+
+      const { passwordHash: _ph, ...safeUser } = updatedUser;
+      return safeUser;
+    } catch (error) {
+      // rollback
+      console.error(
+        "Erreur de transaction lors du reset du mot de passe :",
+        error,
+      );
+      throw error;
+    }
   }
 }

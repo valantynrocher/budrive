@@ -7,6 +7,8 @@ import {
   ConfirmSchema,
   type ForgotPwdDto,
   ForgotPwdSchema,
+  type ResetPwdDto,
+  ResetPwdSchema,
   type SignInDto,
   SignInSchema,
   type SignUpDto,
@@ -15,8 +17,10 @@ import {
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -133,5 +137,21 @@ export class AuthController {
     @Body(new ZodValidationPipe(ForgotPwdSchema)) credentials: ForgotPwdDto,
   ) {
     return this.authService.forgotPassword(credentials);
+  }
+
+  @Get("verify-reset-token")
+  async verifyResetToken(@Query("token") token: string) {
+    await this.authService.verifyResetToken(token);
+
+    return {
+      status: "ok",
+    };
+  }
+
+  @Post("reset-password")
+  async resetPassword(
+    @Body(new ZodValidationPipe(ResetPwdSchema)) credentials: ResetPwdDto,
+  ) {
+    return await this.authService.resetPassword(credentials);
   }
 }

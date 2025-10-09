@@ -1,6 +1,7 @@
 import { PrismaService } from "@/prisma/prisma.service";
-import { Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { AuthErrors } from "@budrive/validation";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PasswordResetToken, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
 
@@ -21,5 +22,27 @@ export class PasswordResetTokenService {
     });
 
     return { tokenValue };
+  }
+
+  async validateToken(token: string) {
+    const activeTokens = await this.prisma.passwordResetToken.findMany({
+      where: { expiresAt: { gt: new Date() } },
+    });
+
+    for (const resetToken of activeTokens) {
+      const isMatch = await bcrypt.compare(token, resetToken.token);
+
+      if (isMatch) {
+        return resetToken;
+      }
+    }
+
+    throw new NotFoundException(AuthErrors.RESET_PWD_TOKEN_NO_FOUND);
+  }
+
+  async deleteById(id: PasswordResetToken["id"]) {
+    return await this.prisma.passwordResetToken.delete({
+      where: { id },
+    });
   }
 }

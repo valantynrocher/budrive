@@ -65,13 +65,12 @@ export class MailService implements OnModuleInit {
              <a href="${link}">${link}</a>`,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const info = await this.transporter.sendMail(mailOptions);
 
     if (process.env.NODE_ENV !== "production") {
       const previewUrl = nodemailer.getTestMessageUrl(info);
       if (previewUrl) {
-        this.logger.debug(`Preview URL: ${previewUrl}`);
+        this.logger.debug(`sendEmailConfirmation Preview URL: ${previewUrl}`);
       }
     }
 
@@ -96,13 +95,38 @@ export class MailService implements OnModuleInit {
              <p>Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet e-mail.</p>`,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const info = await this.transporter.sendMail(mailOptions);
 
     if (process.env.NODE_ENV !== "production") {
       const previewUrl = nodemailer.getTestMessageUrl(info);
       if (previewUrl) {
-        this.logger.debug(`Preview URL: ${previewUrl}`);
+        this.logger.debug(`sendPasswordReset Preview URL: ${previewUrl}`);
+      }
+    }
+
+    return info;
+  }
+
+  async sendPasswordResetConfirm(email: string) {
+    if (!this.transporter) {
+      throw new Error("Mail transporter is not initialized");
+    }
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: "'Budrive' <valentinrocher+budrive@gmail.com>",
+      to: email,
+      subject: "[Budrive] Réinitialisation de votre mot de passe",
+      html: `<p>Votre mot de passe a bien été réinitialisé.</p>`,
+    };
+
+    const info = await this.transporter.sendMail(mailOptions);
+
+    if (process.env.NODE_ENV !== "production") {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        this.logger.debug(
+          `sendPasswordResetConfirm Preview URL: ${previewUrl}`,
+        );
       }
     }
 
