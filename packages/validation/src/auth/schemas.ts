@@ -1,18 +1,13 @@
 import { z } from "zod";
 import { AuthErrors } from "./messages";
-import { passwordSchema } from "./utils";
+import { emailValidation, passwordValidation } from "./utils";
 
 /**
  * AuthCredentials
  */
 export const AuthCredentialsSchema = z.object({
-  email: z
-    .string({
-      required_error: AuthErrors.EMAIL_REQUIRED,
-    })
-    .min(1, AuthErrors.EMAIL_REQUIRED)
-    .email(AuthErrors.EMAIL_INVALID),
-  password: passwordSchema,
+  email: emailValidation,
+  password: passwordValidation,
 });
 
 export type AuthCredentialsDto = z.infer<typeof AuthCredentialsSchema>;
@@ -21,7 +16,7 @@ export type AuthCredentialsDto = z.infer<typeof AuthCredentialsSchema>;
  * SignUp
  */
 export const SignUpSchema = AuthCredentialsSchema.extend({
-  confirmPassword: passwordSchema,
+  confirmPassword: passwordValidation,
   fullName: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: AuthErrors.CONFIRM_PASSWORD_NOT_MATCH,
@@ -45,3 +40,12 @@ export const ConfirmSchema = z.object({
 });
 
 export type ConfirmDto = z.infer<typeof ConfirmSchema>;
+
+/**
+ * ForgotPassword
+ */
+export const ForgotPwdSchema = z.object({
+  email: emailValidation,
+});
+
+export type ForgotPwdDto = z.infer<typeof ForgotPwdSchema>;
