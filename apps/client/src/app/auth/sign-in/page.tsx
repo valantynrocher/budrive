@@ -1,5 +1,4 @@
 import SignInForm from "@/components/pages/auth/SignInForm";
-import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 
@@ -16,6 +15,16 @@ const SignInPage = async ({
         Connexion
       </Typography>
       <SignInForm urlError={decodedMessage} />
+      <Typography sx={{ textAlign: "center" }}>
+        <Link
+          href="/auth/forgot-password"
+          style={{
+            alignSelf: "center",
+          }}
+        >
+          Mot de passe oublié
+        </Link>
+      </Typography>
       <Typography sx={{ textAlign: "center" }}>
         Pas encore pas inscrit ?{" "}
         <Link
