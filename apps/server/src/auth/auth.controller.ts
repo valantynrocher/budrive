@@ -5,6 +5,8 @@ import {
   AuthToken,
   type ConfirmDto,
   ConfirmSchema,
+  type ForgotPwdDto,
+  ForgotPwdSchema,
   type SignInDto,
   SignInSchema,
   type SignUpDto,
@@ -124,5 +126,12 @@ export class AuthController {
     clearAuthCookies(res);
 
     return { success: true, message: AuthSuccess.LOGOUT };
+  }
+
+  @Post("forgot-password")
+  async forgotPassword(
+    @Body(new ZodValidationPipe(ForgotPwdSchema)) credentials: ForgotPwdDto,
+  ) {
+    return this.authService.forgotPassword(credentials);
   }
 }

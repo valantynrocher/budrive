@@ -1,5 +1,6 @@
 import { EmailVerificationTokensModule } from "@/email-verification-tokens/email-verification-tokens.module";
 import { MailModule } from "@/mail/mail.module";
+import { PasswordResetTokenModule } from "@/password-reset-token/password-reset-token.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
@@ -14,6 +15,7 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
     UsersModule,
     MailModule,
     EmailVerificationTokensModule,
+    PasswordResetTokenModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

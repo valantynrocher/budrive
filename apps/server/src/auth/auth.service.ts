@@ -1,6 +1,10 @@
+import { EmailVerificationTokensService } from "@/email-verification-tokens/email-verification-tokens.service";
+import { MailService } from "@/mail/mail.service";
+import { PasswordResetTokenService } from "@/password-reset-token/password-reset-token.service";
 import {
   AuthErrors,
   type ConfirmDto,
+  type ForgotPwdDto,
   type SignInDto,
   type SignUpDto,
 } from "@budrive/validation";
@@ -13,8 +17,6 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { UsersService } from "../users/users.service";
-import { MailService } from "@/mail/mail.service";
-import { EmailVerificationTokensService } from "@/email-verification-tokens/email-verification-tokens.service";
 
 @Injectable()
 export class AuthService {
@@ -23,6 +25,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly emailVerificationService: EmailVerificationTokensService,
+    private readonly passwordResetService: PasswordResetTokenService,
   ) {}
 
   private async generateTokens(userId: string) {
@@ -156,5 +159,26 @@ export class AuthService {
   async logout(userId: string) {
     // Supprimer le hachage du token pour révoquer la session
     await this.usersService.updatehashedRefreshToken(userId, null);
+  }
+
+  async forgotPassword(credentials: ForgotPwdDto) {
+    const user = await this.usersService.findByEmail(credentials.email);
+
+    if (!user) {
+      return;
+    }
+
+    // 1. Création du jeton dans le service dédié
+    const { tokenValue } = await this.passwordResetService.createForUser(
+      user.id,
+    );
+
+    // 2. Création du lien
+    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${tokenValue}`;
+
+    // 3. Envoi de l'email
+    await this.mailService.sendPasswordReset(user.email, resetLink);
+
+    return;
   }
 }

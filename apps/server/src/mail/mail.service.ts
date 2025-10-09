@@ -59,10 +59,41 @@ export class MailService implements OnModuleInit {
     const mailOptions: nodemailer.SendMailOptions = {
       from: "'Budrive' <valentinrocher+budrive@gmail.com>",
       to: email,
-      subject: "Confirmez votre compte Budrive",
+      subject: "[Budrive] Confirmez votre compte",
       html: `<p>Merci de vous inscrire sur Budrive !</p>
              <p>Cliquez sur ce lien pour activer votre compte :</p>
              <a href="${link}">${link}</a>`,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const info = await this.transporter.sendMail(mailOptions);
+
+    if (process.env.NODE_ENV !== "production") {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        this.logger.debug(`Preview URL: ${previewUrl}`);
+      }
+    }
+
+    return info;
+  }
+
+  async sendPasswordReset(email: string, token: string) {
+    if (!this.transporter) {
+      throw new Error("Mail transporter is not initialized");
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL ?? "https://localhost:3000";
+    const link = `${frontendUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: "'Budrive' <valentinrocher+budrive@gmail.com>",
+      to: email,
+      subject: "[Budrive] Réinitialisez votre mot de passe",
+      html: `<p>Vous avez demandé à réinitialiser votre mot de passe Budrive !</p>
+             <p>Cliquez sur ce lien pour activer votre compte :</p>
+             <a href="${link}">${link}</a>
+             <p>Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet e-mail.</p>`,
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

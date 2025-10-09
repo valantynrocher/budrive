@@ -23,6 +23,7 @@ model User {
   emailVerificationToken  EmailVerificationToken?   
   isVerified              Boolean                   @default(false)
   hashedRefreshToken      String?
+  passwordResetToken      PasswordResetToken?
   @@map("users")
 }
 
@@ -34,3 +35,11 @@ model EmailVerificationToken {
   expiresAt DateTime
 }
 
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime
+}
