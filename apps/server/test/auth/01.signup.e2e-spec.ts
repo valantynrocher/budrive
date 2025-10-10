@@ -1,6 +1,6 @@
 import { AppModule } from "@/app.module";
-import { MailService } from "@/mail/mail.service";
-import { PrismaService } from "@/prisma/prisma.service";
+import { MailService } from "@/infrastructure/services/mail/mail.service";
+import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
 import {
   AuthErrors,
   AuthSuccess,
