@@ -1,4 +1,4 @@
-import { ZodValidationPipe } from "@/common/zod/zod-validation.pipe";
+import { ZodValidationPipe } from "@/shared/infrastructure/common/zod/zod-validation.pipe";
 import {
   AuthErrors,
   AuthSuccess,
@@ -28,9 +28,9 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { type Request, type Response } from "express";
-import { clearAuthCookies, setAuthCookies } from "./auth.cookies";
-import { AuthService } from "./auth.service";
-import { JwtAuthGuard } from "./guard/jwt-auth.guard";
+import { AuthService } from "../application/auth.service";
+import { JwtAuthGuard } from "./guards/JwtAuth.guard";
+import { clearAuthCookies, setAuthCookies } from "./utils/auth.cookies";
 
 @Controller("auth")
 export class AuthController {

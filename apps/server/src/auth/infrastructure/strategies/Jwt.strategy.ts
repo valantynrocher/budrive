@@ -1,9 +1,9 @@
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { PassportStrategy } from "@nestjs/passport";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { Request } from "express"; // Pour accéder aux cookies
+import { UsersService } from "@/users/application/users.service";
 import { AuthToken } from "@budrive/validation";
-import { UsersService } from "@/users/users.service";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { Request } from "express"; // Pour accéder aux cookies
+import { ExtractJwt, Strategy } from "passport-jwt";
 
 interface JwtPayload {
   sub: string; // With user id corresponding to the token
@@ -34,11 +34,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * This method is called after that token has been checked (signature OK and non expired).
    */
   async validate(payload: JwtPayload) {
-    const user = await this.usersService.findById(payload.sub);
+    const user = await this.usersService.findUserById(payload.sub);
 
     if (!user) throw new UnauthorizedException();
 
     // Le payload est attaché à req.user
-    return { sub: user.id };
+    return { sub: user.getId() };
   }
 }

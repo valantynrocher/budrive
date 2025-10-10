@@ -1,21 +1,20 @@
-import { EmailVerificationTokensModule } from "@/email-verification-tokens/email-verification-tokens.module";
-import { MailModule } from "@/mail/mail.module";
-import { PasswordResetTokenModule } from "@/password-reset-token/password-reset-token.module";
+import { MailModule } from "@/infrastructure/services/mail/mail.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { UsersModule } from "../users/users.module";
-import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
-import { JwtStrategy } from "./strategy/jwt.strategy";
+import { AuthService } from "./application/auth.service";
+import { TokenManagementService } from "./application/token-management.service";
+import { AuthController } from "./infrastructure/auth.controller";
+import { JwtStrategy } from "./infrastructure/strategies/Jwt.strategy";
+import { TOKEN_REPOSITORY } from "@/auth/domain/TokenRepository.interface";
+import { PrismaTokenRepository } from "@/auth/infrastructure/persistence/PrismaToken.repository";
 
 @Module({
   imports: [
     UsersModule,
     MailModule,
-    EmailVerificationTokensModule,
-    PasswordResetTokenModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -26,7 +25,15 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService,
+    TokenManagementService,
+    JwtStrategy,
+    {
+      provide: TOKEN_REPOSITORY,
+      useClass: PrismaTokenRepository,
+    },
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

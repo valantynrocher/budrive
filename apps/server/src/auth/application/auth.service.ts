@@ -1,6 +1,7 @@
-import { EmailVerificationTokensService } from "@/email-verification-tokens/email-verification-tokens.service";
-import { MailService } from "@/mail/mail.service";
-import { PasswordResetTokenService } from "@/password-reset-token/password-reset-token.service";
+import { TokenManagementService } from "@/auth/application/token-management.service";
+import { MailService } from "@/infrastructure/services/mail/mail.service";
+import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
+import { UsersService } from "@/users/application/users.service";
 import {
   AuthErrors,
   ResetPwdDto,
@@ -17,8 +18,6 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import { UsersService } from "../users/users.service";
-import { PrismaService } from "@/prisma/prisma.service";
 
 @Injectable()
 export class AuthService {
@@ -26,8 +25,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-    private readonly emailVerificationService: EmailVerificationTokensService,
-    private readonly passwordResetService: PasswordResetTokenService,
+    private readonly tokenManagementService: TokenManagementService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -70,7 +68,9 @@ export class AuthService {
   }
 
   async signUp(credentials: SignUpDto) {
-    const existingUser = await this.usersService.findByEmail(credentials.email);
+    const existingUser = await this.usersService.findUserByEmail(
+      credentials.email,
+    );
 
     if (existingUser) {
       throw new ConflictException(AuthErrors.EMAIL_ALREADY_EXISTS);
@@ -81,43 +81,54 @@ export class AuthService {
       credentials.confirmPassword,
     );
 
-    const user = await this.usersService.create({
+    const user = await this.usersService.registerUser({
       email: credentials.email,
       passwordHash,
       fullName: credentials?.fullName,
     });
 
-    const { token } = await this.emailVerificationService.createForUser(
-      user.id,
+    const emailToken =
+      await this.tokenManagementService.createEmailVerificationTokenForUser(
+        user.getId(),
+      );
+
+    await this.mailService.sendEmailConfirmation(
+      user.getEmail(),
+      emailToken.getToken(),
     );
 
-    await this.mailService.sendEmailConfirmation(user.email, token);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash: _ph, ...safeUser } = user;
-    return safeUser;
+    return {
+      id: user.getId(),
+      email: user.getEmail(),
+      fullName: user.getFullName(),
+    };
   }
 
   async confirm(payload: ConfirmDto) {
-    const record = await this.emailVerificationService.findByToken(
-      payload.token,
-    );
-    if (!record || record.expiresAt < new Date()) {
+    const emailToken =
+      await this.tokenManagementService.findEmailVerificationToken(
+        payload.token,
+      );
+    if (!emailToken || emailToken.getExpiresAt() < new Date()) {
       throw new BadRequestException(AuthErrors.TOKEN_INVALID_EXPIRED);
     }
 
-    const user = await this.usersService.verifyUser(record.userId);
+    const user = await this.usersService.verify(emailToken.getUserId());
 
-    await this.emailVerificationService.deleteById(record.id);
+    await this.tokenManagementService.deleteEmailVerificationTokenById(
+      emailToken.getId(),
+    );
 
-    const { accessToken, refreshToken } = await this.generateTokens(user.id);
-    await this.updateRefreshToken(user.id, refreshToken);
+    const { accessToken, refreshToken } = await this.generateTokens(
+      user.getId(),
+    );
+    await this.updateRefreshToken(user.getId(), refreshToken);
 
     return { accessToken, refreshToken };
   }
 
   async signIn(credentials: SignInDto) {
-    const user = await this.usersService.findByEmail(credentials.email);
+    const user = await this.usersService.findUserByEmail(credentials.email);
 
     if (!user) {
       throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
@@ -125,23 +136,25 @@ export class AuthService {
 
     const passwordMatch = await bcrypt.compare(
       credentials.password,
-      user.passwordHash,
+      user.getPasswordHash(),
     );
 
     if (!passwordMatch) {
       throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
     }
 
-    const { accessToken, refreshToken } = await this.generateTokens(user.id);
-    await this.updateRefreshToken(user.id, refreshToken);
+    const { accessToken, refreshToken } = await this.generateTokens(
+      user.getId(),
+    );
+    await this.updateRefreshToken(user.getId(), refreshToken);
 
     return { accessToken, refreshToken };
   }
 
   async refreshTokens(userId: string, oldRefreshToken: string) {
-    const user = await this.usersService.findById(userId);
+    const user = await this.usersService.findUserById(userId);
 
-    if (!user || !user.hashedRefreshToken) {
+    if (!user || !user.getHashedRefreshToken()) {
       // Session révoquée ou jamais établie
       throw new UnauthorizedException("Accès refusé. Session non trouvée.");
     }
@@ -149,7 +162,7 @@ export class AuthService {
     // 1. Comparaison du token reçu (oldRefreshToken) avec le hachage en DB
     const isRefreshTokenValid = await bcrypt.compare(
       oldRefreshToken,
-      user.hashedRefreshToken,
+      user.getHashedRefreshToken() || "",
     );
 
     if (!isRefreshTokenValid) {
@@ -160,10 +173,10 @@ export class AuthService {
 
     // 2. Génération de NOUVEAUX tokens
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-      await this.generateTokens(user.id);
+      await this.generateTokens(user.getId());
 
     // 3. Stockage du hachage du NOUVEAU Refresh Token (Rotation des Tokens)
-    await this.updateRefreshToken(user.id, newRefreshToken);
+    await this.updateRefreshToken(user.getId(), newRefreshToken);
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
@@ -174,33 +187,35 @@ export class AuthService {
   }
 
   async forgotPassword(credentials: ForgotPwdDto) {
-    const user = await this.usersService.findByEmail(credentials.email);
+    const user = await this.usersService.findUserByEmail(credentials.email);
 
     if (!user) {
       return;
     }
 
     // 1. Création du jeton dans le service dédié
-    const { tokenValue } = await this.passwordResetService.createForUser(
-      user.id,
-    );
+    const { tokenValue } =
+      await this.tokenManagementService.createPasswordResetTokenForUser(
+        user.getId(),
+      );
 
     // 3. Envoi de l'email
-    await this.mailService.sendPasswordReset(user.email, tokenValue);
+    await this.mailService.sendPasswordReset(user.getEmail(), tokenValue);
 
     return;
   }
 
   async verifyResetToken(token: string) {
-    await this.passwordResetService.validateToken(token);
+    await this.tokenManagementService.validatePasswordResetToken(token);
 
     return;
   }
 
   async resetPassword(credentials: ResetPwdDto) {
-    const resetToken = await this.passwordResetService.validateToken(
-      credentials.token,
-    );
+    const resetToken =
+      await this.tokenManagementService.validatePasswordResetToken(
+        credentials.token,
+      );
 
     const passwordHash = await this.createPasswordHash(
       credentials.password,
@@ -213,12 +228,12 @@ export class AuthService {
       // 3. Exécution de la Transaction
       await this.prisma.$transaction(async (tx) => {
         updatedUser = await tx.user.update({
-          where: { id: resetToken.userId },
+          where: { id: resetToken.getUserId() },
           data: { passwordHash: passwordHash },
         });
 
         await tx.passwordResetToken.delete({
-          where: { id: resetToken.id },
+          where: { id: resetToken.getId() },
         });
       });
 
