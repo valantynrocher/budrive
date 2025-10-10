@@ -1,7 +1,12 @@
 import { AppModule } from "@/app.module";
-import { SignUpDto, AuthErrors } from "@budrive/validation";
 import { MailService } from "@/mail/mail.service";
 import { PrismaService } from "@/prisma/prisma.service";
+import {
+  AuthErrors,
+  AuthSuccess,
+  AuthToken,
+  SignUpDto,
+} from "@budrive/validation";
 import {
   ConflictException,
   INestApplication,
@@ -10,23 +15,21 @@ import {
 import { Test, TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { App } from "supertest/types";
+import {
+  email1,
+  email2,
+  email3,
+  email4,
+  email5,
+  email6,
+  password,
+} from "./data";
+import { ErrorResponse } from "./types";
 
-interface ErrorResponse {
-  statusCode: number;
-  message: string | string[];
-  error: string;
-}
-
-describe("Auth features (e2e)", () => {
+describe("Auth sign-up features (e2e)", () => {
   let app: INestApplication<App>;
   let prisma: PrismaService;
   let mailService: MailService;
-
-  const [email1, email2, email3, email4, email5, email6] = Array.from(
-    Array(10).keys(),
-  ).map((value) => `newuser${value + 1}@example.com`);
-
-  const password = "strongPassword123";
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -256,7 +259,14 @@ describe("Auth features (e2e)", () => {
           .send({ token: tokenRecord.token })
           .expect(201);
 
-        expect(confirmRes.body).toHaveProperty("accessToken");
+        expect(confirmRes.body.success).toBe(true);
+        expect(confirmRes.body.message).toBe(AuthSuccess.USER_CONFIRMED);
+
+        // Check of 'set-cookie' headers cookies
+        expect(confirmRes.headers["set-cookie"]).toEqual([
+          expect.stringContaining(AuthToken.ACCESS_TOKEN_COOKIE_NAME),
+          expect.stringContaining(AuthToken.REFRESH_TOKEN_COOKIE_NAME),
+        ]);
 
         // 4. vérifier que user est bien isVerified en DB
         const user = await prisma.user.findUnique({
@@ -307,154 +317,5 @@ describe("Auth features (e2e)", () => {
         );
       });
     });
-  });
-
-  describe("POST to /auth/sign-in", () => {
-    const endpoint = "/auth/sign-in";
-
-    describe("Success cases", () => {
-      it("→ should sign in with valid credentials", async () => {
-        await request(app.getHttpServer())
-          .post(endpoint)
-          .send({
-            email: email1,
-            password,
-          })
-          .expect(201);
-      });
-
-      it("→ should return a JWT access token", async () => {
-        const response = await request(app.getHttpServer())
-          .post(endpoint)
-          .send({
-            email: email1,
-            password,
-          })
-          .expect(201);
-
-        expect(response.body).toHaveProperty("accessToken");
-        const token = (response.body as { accessToken: string })
-          .accessToken as unknown;
-        expect(typeof token).toBe("string");
-        expect((token as string).split(".")).toHaveLength(3);
-      });
-
-      it("→ should return user info without sensitive fields (e.g. password)", async () => {
-        await request(app.getHttpServer())
-          .post(endpoint)
-          .send({
-            email: email1,
-            password,
-          })
-          .expect(201)
-          .expect((res) => {
-            expect(res.body).not.toHaveProperty("password");
-            expect(res.body).not.toHaveProperty("confirmPassword");
-          });
-      });
-    });
-
-    describe("Validation errors", () => {
-      describe("email field", () => {
-        it("→ should not allow missing email", async () => {
-          await request(app.getHttpServer())
-            .post(endpoint)
-            .send({
-              password,
-            })
-            .expect(400)
-            .expect((res) => {
-              expect((res.body as ErrorResponse).message).toContain(
-                AuthErrors.EMAIL_REQUIRED,
-              );
-            });
-        });
-
-        it("→ should not allow invalid email format", async () => {
-          await request(app.getHttpServer())
-            .post(endpoint)
-            .send({
-              email: "testuser@example",
-              password,
-            })
-            .expect(400)
-            .expect((res) => {
-              expect((res.body as ErrorResponse).message).toContain(
-                AuthErrors.EMAIL_INVALID,
-              );
-            });
-        });
-      });
-
-      describe("password field", () => {
-        it("→ should not allow missing password", async () => {
-          await request(app.getHttpServer())
-            .post(endpoint)
-            .send({
-              email: email1,
-            })
-            .expect(400)
-            .expect((res) => {
-              expect((res.body as ErrorResponse).message).toContain(
-                AuthErrors.PASSWORD_REQUIRED,
-              );
-            });
-        });
-
-        it("→ should not allow to short password (under 8 characters)", async () => {
-          await request(app.getHttpServer())
-            .post(endpoint)
-            .send({
-              email: email1,
-              password: "123",
-              confirmPassword: "123",
-            })
-            .expect(400)
-            .expect((res) => {
-              expect((res.body as ErrorResponse).message).toContain(
-                AuthErrors.PASSWORD_TOO_SHORT,
-              );
-            });
-        });
-      });
-    });
-
-    describe("Authentication errors", () => {
-      it("→ should not sign in with unregistered email", async () => {
-        await request(app.getHttpServer())
-          .post(endpoint)
-          .send({
-            email: "unregistered@example.com",
-            password: "unregisteredPassword123",
-          })
-          .expect(401);
-      });
-
-      it("→ should not sign in with wrong password", async () => {
-        await request(app.getHttpServer())
-          .post(endpoint)
-          .send({
-            email: email1,
-            password: "wrongPassword123",
-          })
-          .expect(401);
-      });
-
-      it("→ should return a generic error message for invalid credentials", async () => {
-        const response = await request(app.getHttpServer())
-          .post(endpoint)
-          .send({
-            email: "unregistered@example.com",
-            password: "unregisteredPassword123",
-          })
-          .expect(401);
-
-        expect((response.body as ErrorResponse).message).toBe(
-          AuthErrors.INVALID_CREDENTIALS,
-        );
-      });
-    });
-
-    describe("Security considerations", () => {});
   });
 });
