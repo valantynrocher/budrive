@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import * as bcrypt from "bcrypt";
-import { TokenManagementService } from "@/auth/application/token-management.service";
-import { PasswordResetToken } from "@/auth/domain/PasswordResetToken.entity";
+import { TokenManagementService } from "@/contexts/Auth/application/TokenManagement.service";
+import { PasswordResetToken } from "@/contexts/Auth/domain/PasswordResetToken.entity";
 import {
   ITokenRepository,
   TOKEN_REPOSITORY,
-} from "@/auth/domain/TokenRepository.interface";
+} from "@/contexts/Auth/domain/TokenRepository.interface";
 import { NotFoundException } from "@nestjs/common";
 import { randomBytes } from "crypto"; // Assurez-vous d'importer randomBytes ou de le mocker
 

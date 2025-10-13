@@ -1,5 +1,9 @@
 import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
-import { IUserRepository, User, UserCreationData } from "@/users/domain"; // Importe du Domain
+import {
+  IUserRepository,
+  User,
+  UserCreationData,
+} from "@/contexts/User/domain"; // Importe du Domain
 import { Injectable } from "@nestjs/common";
 import type { User as PrismaUser } from "@prisma/client";
 

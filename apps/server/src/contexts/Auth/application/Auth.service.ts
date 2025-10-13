@@ -1,7 +1,7 @@
-import { TokenManagementService } from "@/auth/application/token-management.service";
+import { TokenManagementService } from "@/contexts/Auth/application/TokenManagement.service";
 import { MailService } from "@/infrastructure/services/mail/mail.service";
 import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
-import { UsersService } from "@/users/application/users.service";
+import { UserService } from "@/contexts/User/application/User.service";
 import {
   AuthErrors,
   ResetPwdDto,
@@ -22,7 +22,7 @@ import * as bcrypt from "bcrypt";
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly tokenManagementService: TokenManagementService,
@@ -50,10 +50,7 @@ export class AuthService {
   private async updateRefreshToken(userId: string, refreshToken: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    await this.usersService.updatehashedRefreshToken(
-      userId,
-      hashedRefreshToken,
-    );
+    await this.userService.updatehashedRefreshToken(userId, hashedRefreshToken);
   }
 
   private async createPasswordHash(password: string, confirmPassword: string) {
@@ -68,7 +65,7 @@ export class AuthService {
   }
 
   async signUp(credentials: SignUpDto) {
-    const existingUser = await this.usersService.findUserByEmail(
+    const existingUser = await this.userService.findUserByEmail(
       credentials.email,
     );
 
@@ -81,7 +78,7 @@ export class AuthService {
       credentials.confirmPassword,
     );
 
-    const user = await this.usersService.registerUser({
+    const user = await this.userService.registerUser({
       email: credentials.email,
       passwordHash,
       fullName: credentials?.fullName,
@@ -113,7 +110,7 @@ export class AuthService {
       throw new BadRequestException(AuthErrors.TOKEN_INVALID_EXPIRED);
     }
 
-    const user = await this.usersService.verify(emailToken.getUserId());
+    const user = await this.userService.verify(emailToken.getUserId());
 
     await this.tokenManagementService.deleteEmailVerificationTokenById(
       emailToken.getId(),
@@ -128,7 +125,7 @@ export class AuthService {
   }
 
   async signIn(credentials: SignInDto) {
-    const user = await this.usersService.findUserByEmail(credentials.email);
+    const user = await this.userService.findUserByEmail(credentials.email);
 
     if (!user) {
       throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
@@ -152,7 +149,7 @@ export class AuthService {
   }
 
   async refreshTokens(userId: string, oldRefreshToken: string) {
-    const user = await this.usersService.findUserById(userId);
+    const user = await this.userService.findUserById(userId);
 
     if (!user || !user.getHashedRefreshToken()) {
       // Session révoquée ou jamais établie
@@ -167,7 +164,7 @@ export class AuthService {
 
     if (!isRefreshTokenValid) {
       // Mesure de sécurité : Si le token est invalide, on révoque tous les tokens (faille)
-      await this.usersService.updatehashedRefreshToken(userId, null);
+      await this.userService.updatehashedRefreshToken(userId, null);
       throw new UnauthorizedException("Token de rafraîchissement invalide.");
     }
 
@@ -183,11 +180,11 @@ export class AuthService {
 
   async logout(userId: string) {
     // Supprimer le hachage du token pour révoquer la session
-    await this.usersService.updatehashedRefreshToken(userId, null);
+    await this.userService.updatehashedRefreshToken(userId, null);
   }
 
   async forgotPassword(credentials: ForgotPwdDto) {
-    const user = await this.usersService.findUserByEmail(credentials.email);
+    const user = await this.userService.findUserByEmail(credentials.email);
 
     if (!user) {
       return;

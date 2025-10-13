@@ -1,4 +1,4 @@
-import { UsersService } from "@/users/application/users.service";
+import { UserService } from "@/contexts/User/application/User.service";
 import { AuthToken } from "@budrive/validation";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
@@ -11,7 +11,7 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usersService: UsersService) {
+  constructor(private readonly userService: UserService) {
     super({
       // 1. Read the secret to validate token's signature
       secretOrKey: process.env.JWT_SECRET!,
@@ -34,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * This method is called after that token has been checked (signature OK and non expired).
    */
   async validate(payload: JwtPayload) {
-    const user = await this.usersService.findUserById(payload.sub);
+    const user = await this.userService.findUserById(payload.sub);
 
     if (!user) throw new UnauthorizedException();
 

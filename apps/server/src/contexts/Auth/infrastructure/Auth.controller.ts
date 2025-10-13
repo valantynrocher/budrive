@@ -28,9 +28,9 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { type Request, type Response } from "express";
-import { AuthService } from "../application/auth.service";
+import { AuthService } from "../application/Auth.service";
 import { JwtAuthGuard } from "./guards/JwtAuth.guard";
-import { clearAuthCookies, setAuthCookies } from "./utils/auth.cookies";
+import { clearAuthCookies, setAuthCookies } from "./utils/Auth.cookies";
 
 @Controller("auth")
 export class AuthController {

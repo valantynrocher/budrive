@@ -1,4 +1,4 @@
-import { User } from "@/users/domain/User.entity";
+import { User } from "@/contexts/User/domain/User.entity";
 import { beforeEach } from "node:test";
 
 describe("User Entity (Domain rules)", () => {

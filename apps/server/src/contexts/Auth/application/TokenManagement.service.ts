@@ -5,7 +5,7 @@ import * as bcrypt from "bcrypt";
 import {
   ITokenRepository,
   TOKEN_REPOSITORY,
-} from "@/auth/domain/TokenRepository.interface";
+} from "@/contexts/Auth/domain/TokenRepository.interface";
 
 @Injectable()
 export class TokenManagementService {

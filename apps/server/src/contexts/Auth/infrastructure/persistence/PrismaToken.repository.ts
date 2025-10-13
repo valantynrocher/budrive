@@ -1,10 +1,10 @@
-import { EmailVerificationToken } from "@/auth/domain/EmailVerificationToken.entity";
-import { PasswordResetToken } from "@/auth/domain/PasswordResetToken.entity";
+import { EmailVerificationToken } from "@/contexts/Auth/domain/EmailVerificationToken.entity";
+import { PasswordResetToken } from "@/contexts/Auth/domain/PasswordResetToken.entity";
 import {
   CreateEmailTokenData,
   CreatePasswordResetTokenData,
   ITokenRepository,
-} from "@/auth/domain/TokenRepository.interface";
+} from "@/contexts/Auth/domain/TokenRepository.interface";
 import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
 import { Injectable } from "@nestjs/common";
 import type {

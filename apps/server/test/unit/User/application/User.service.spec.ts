@@ -1,5 +1,5 @@
-import { UsersService } from "@/users/application/users.service";
-import { IUserRepository, User, USER_REPOSITORY } from "@/users/domain";
+import { UserService } from "@/contexts/User/application/User.service";
+import { IUserRepository, User, USER_REPOSITORY } from "@/contexts/User/domain";
 import { Test, TestingModule } from "@nestjs/testing";
 
 const mockUserRepository = {
@@ -10,20 +10,20 @@ const mockUserRepository = {
   create: jest.fn(),
 };
 
-describe("UsersService (Application Layer)", () => {
-  let service: UsersService;
+describe("UserService (Application Layer)", () => {
+  let service: UserService;
   let repository: IUserRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UsersService,
+        UserService,
         // Câblage du Mock: l'interface est injectée avec l'objet mock
         { provide: USER_REPOSITORY, useValue: mockUserRepository },
       ],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
+    service = module.get<UserService>(UserService);
     repository = module.get<IUserRepository>(USER_REPOSITORY);
 
     mockUserRepository.findById.mockClear();
