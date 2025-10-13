@@ -1,43 +1,22 @@
-export class PasswordResetToken {
-  private id: string;
-  private token: string;
-  private userId: string;
-  private expiresAt: Date;
+import { Token, TokenData } from "@/shared/domain/entities/Token.entity";
+
+export type PasswordResetTokenData = TokenData & {
+  createdAt: Date;
+};
+
+export class PasswordResetToken extends Token {
   private createdAt: Date;
 
-  constructor(data: {
-    id: string;
-    token: string;
-    userId: string;
-    expiresAt: Date;
-    createdAt: Date;
-  }) {
-    this.id = data.id;
-    this.token = data.token;
-    this.userId = data.userId;
-    this.expiresAt = data.expiresAt;
+  constructor(data: PasswordResetTokenData) {
+    super(data);
     this.createdAt = data.createdAt;
   }
 
-  // --- Getters (Accesseurs) ---
-  public getId(): string {
-    return this.id;
-  }
-  public getTokenHash(): string {
-    return this.token;
-  }
-  public getUserId(): string {
-    return this.userId;
-  }
-  public getExpiresAt(): Date {
-    return this.expiresAt;
-  }
+  // --- Getters ---
   public getCreatedAt(): Date {
     return this.createdAt;
   }
-
-  // Méthodes Métier
-  public isExpired(): boolean {
-    return this.expiresAt < new Date();
+  public getTokenHash(): string {
+    return this.token;
   }
 }
