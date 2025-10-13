@@ -29,6 +29,6 @@ export default {
     "!src/shared/infrastructure/prisma/prisma.service.ts", // On mocke le client, on peut l'exclure ici
     "!src/infrastructure/services/mail/mail.service.ts", // On peut l'exclure si on teste juste qu'il est appelé
   ],
-  coverageDirectory: "../coverage",
+  coverageDirectory: "./coverage",
   transformIgnorePatterns: ["/node_modules/"],
 };
