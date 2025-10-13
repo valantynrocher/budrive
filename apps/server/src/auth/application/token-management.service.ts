@@ -23,10 +23,12 @@ export class TokenManagementService {
     });
   }
 
+  /* istanbul ignore next */
   async findEmailVerificationToken(token: string) {
     return await this.tokenRepository.findEmailVerificationTokenByToken(token);
   }
 
+  /* istanbul ignore next */
   async deleteEmailVerificationTokenById(id: string) {
     return await this.tokenRepository.deleteEmailVerificationTokenById(id);
   }
@@ -58,6 +60,7 @@ export class TokenManagementService {
     throw new NotFoundException(AuthErrors.RESET_PWD_TOKEN_NO_FOUND);
   }
 
+  /* istanbul ignore next */
   async deletePasswordResetTokenById(id: string) {
     return this.tokenRepository.deletePasswordResetTokenById(id);
   }

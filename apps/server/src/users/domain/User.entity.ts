@@ -48,9 +48,14 @@ export class User {
   public getFullName(): string | null {
     return this.fullName;
   }
+  public getCreatedAt(): Date {
+    return this.createdAt;
+  }
+  public getUpdatedt(): Date | null {
+    return this.updatedAt;
+  }
 
   // --- Méthodes Métier (Mutateurs d'état) ---
-
   public verify(): void {
     if (this.isVerified) {
       // Optionnel: lever une erreur si déjà vérifié
@@ -61,7 +66,6 @@ export class User {
 
   public updatePassword(newPasswordHash: string): void {
     this.passwordHash = newPasswordHash;
-    // Potentiel: Invalider le refresh token ici si la règle métier l'exige
   }
 
   public setRefreshTokenHash(hash: string | null): void {

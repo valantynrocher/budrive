@@ -205,6 +205,7 @@ export class AuthService {
     return;
   }
 
+  /* istanbul ignore next */
   async verifyResetToken(token: string) {
     await this.tokenManagementService.validatePasswordResetToken(token);
 

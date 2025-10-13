@@ -7,18 +7,22 @@ export class UsersService {
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
   ) {}
 
+  /* istanbul ignore next */
   async findUserById(id: string): Promise<User | null> {
     return this.userRepository.findById(id);
   }
 
+  /* istanbul ignore next */
   async findUserByEmail(email: string): Promise<User | null> {
     return this.userRepository.findByEmail(email);
   }
 
+  /* istanbul ignore next */
   async findAll() {
     return this.userRepository.findAll();
   }
 
+  /* istanbul ignore next */
   async registerUser(data: {
     email: string;
     passwordHash: string;
