@@ -1,36 +1,29 @@
-import { User } from "@/contexts/User/domain/User.entity";
+import { OnboardingStatus, User } from "@/contexts/User/domain/User.entity";
 import { beforeEach } from "node:test";
 
 describe("User Entity (Domain rules)", () => {
   let user: User;
+  const baseUserMock = {
+    id: "15359d93-3c66-44bc-8f30-0ee96fb15263",
+    email: "newuser1@example.com",
+    passwordHash:
+      "$2b$10$hN1kFo.1O5Ewciapol1tQON5zGpNyu3hR/S6CVygI5vzIEPwPVE4a",
+  };
 
-  beforeEach(() => {
-    user = new User({
-      id: "15359d93-3c66-44bc-8f30-0ee96fb15263",
-      email: "newuser1@example.com",
-      passwordHash:
-        "$2b$10$hN1kFo.1O5Ewciapol1tQON5zGpNyu3hR/S6CVygI5vzIEPwPVE4a",
-      createdAt: new Date(),
-      isVerified: false,
-      hashedRefreshToken: null,
-      fullName: null,
-      updatedAt: null,
-    });
+  beforeAll(() => {
+    user = new User(baseUserMock);
   });
 
-  it("→ should be able to create a User instance", () => {
-    user = new User({
-      id: "15359d93-3c66-44bc-8f30-0ee96fb15263",
-      email: "newuser1@example.com",
-      passwordHash:
-        "$2b$10$hN1kFo.1O5Ewciapol1tQON5zGpNyu3hR/S6CVygI5vzIEPwPVE4a",
-      createdAt: new Date(),
-      isVerified: false,
-      hashedRefreshToken: null,
-      fullName: null,
-      updatedAt: null,
+  describe("User Entity constructor", () => {
+    it("→ user should be defined when a User instance is created", () => {
+      expect(user).toBeDefined();
     });
-    expect(user).toBeDefined();
+
+    it("should initialize a new user with PENDING status and step 0 by default", () => {
+      expect(user.getOnboardingStatus()).toBe(OnboardingStatus.PENDING);
+      expect(user.getOnboardingStep()).toBe(0);
+      expect(user.isOnboardingCompleted()).toBe(false);
+    });
   });
 
   describe("verify method", () => {
@@ -64,6 +57,33 @@ describe("User Entity (Domain rules)", () => {
       user.setRefreshTokenHash(newHash);
 
       expect(user.getHashedRefreshToken()).toEqual(newHash);
+    });
+  });
+
+  describe("onboarding methods", () => {
+    it("should update the onboarding step and set status to IN_PROGRESS", () => {
+      // Simule la complétion de l'étape 1
+      user.updateOnboardingStep(1);
+
+      expect(user.getOnboardingStep()).toBe(1);
+      expect(user.getOnboardingStatus()).toBe(OnboardingStatus.IN_PROGRESS);
+
+      // Simule la complétion de l'étape 2
+      user.updateOnboardingStep(2);
+      expect(user.getOnboardingStep()).toBe(2);
+    });
+
+    it("should set onboarding status to COMPLETED and return true for isOnboardingCompleted", () => {
+      const user = new User({
+        ...baseUserMock,
+        onboardingStatus: OnboardingStatus.IN_PROGRESS,
+        onboardingStep: 2,
+      });
+
+      user.completeOnboarding();
+
+      expect(user.getOnboardingStatus()).toBe(OnboardingStatus.COMPLETED);
+      expect(user.isOnboardingCompleted()).toBe(true);
     });
   });
 });
