@@ -25,6 +25,7 @@ Chaque application possède son propre `README.md` avec des instructions spécif
 | Design system           | [Material UI](https://mui.com/)             |
 | Backend                 | [NestJS](https://nestjs.com/) + TypeScript  |
 | Auth & DB               | [Supabase](https://supabase.com/)           |
+| ORM                     | [Prisma](https://supabase.com/)             |
 | Monorepo                | [Turborepo](https://turbo.build/repo)       |
 | Gestionnaire de paquets | [pnpm](https://pnpm.io/)                    |
 
@@ -56,7 +57,7 @@ pnpm dev
 ```
 
 - Frontend : [http://localhost:3000](http://localhost:3000)
-- Backend : [http://localhost:4000](http://localhost:4000) (ou celui défini dans `.env`)
+- Backend : [http://localhost:3001](http://localhost:4000) (ou celui défini dans `.env`)
 
 ---
 
