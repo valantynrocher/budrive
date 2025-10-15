@@ -153,7 +153,7 @@ export class AuthService {
 
     if (!user || !user.getHashedRefreshToken()) {
       // Session révoquée ou jamais établie
-      throw new UnauthorizedException("Accès refusé. Session non trouvée.");
+      throw new UnauthorizedException(AuthErrors.SESSION_EXPIRED_INVALID);
     }
 
     // 1. Comparaison du token reçu (oldRefreshToken) avec le hachage en DB
@@ -165,7 +165,7 @@ export class AuthService {
     if (!isRefreshTokenValid) {
       // Mesure de sécurité : Si le token est invalide, on révoque tous les tokens (faille)
       await this.userService.updatehashedRefreshToken(userId, null);
-      throw new UnauthorizedException("Token de rafraîchissement invalide.");
+      throw new UnauthorizedException(AuthErrors.REFRESH_TOKEN_INVALID);
     }
 
     // 2. Génération de NOUVEAUX tokens

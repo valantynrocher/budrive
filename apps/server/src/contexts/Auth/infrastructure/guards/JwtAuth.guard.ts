@@ -1,3 +1,4 @@
+import { AuthErrors } from "@budrive/validation";
 import {
   Injectable,
   ExecutionContext,
@@ -22,9 +23,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     // Si la validation a échoué (err ou info est présent) ou si la stratégie n'a rien renvoyé (pas d'utilisateur)
     if (err || !user) {
       // Strategy has encountered a problem or token was not found or is not valid.
-      throw (
-        err || new UnauthorizedException("Accès non autorisé. Session requise.")
-      );
+      throw err || new UnauthorizedException(AuthErrors.SESSION_REQUIRED);
     }
 
     return user;

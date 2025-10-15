@@ -260,7 +260,7 @@ describe("Auth sign-up features (e2e)", () => {
           .expect(201);
 
         expect(confirmRes.body.success).toBe(true);
-        expect(confirmRes.body.message).toBe(AuthSuccess.USER_CONFIRMED);
+        expect(confirmRes.body.message).toBe(AuthSuccess.CONFIRM);
 
         // Check of 'set-cookie' headers cookies
         expect(confirmRes.headers["set-cookie"]).toEqual([

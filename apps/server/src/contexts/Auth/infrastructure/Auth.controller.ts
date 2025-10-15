@@ -59,7 +59,7 @@ export class AuthController {
 
     return {
       success: true,
-      message: AuthSuccess.USER_CONFIRMED,
+      message: AuthSuccess.CONFIRM,
     };
   }
 
@@ -109,11 +109,11 @@ export class AuthController {
       // Définition des NOUVEAUX cookies
       setAuthCookies(res, accessToken, newRefreshToken);
 
-      return { success: true };
+      return { success: true, message: AuthSuccess.REFRESH };
     } catch (e) {
       // En cas d'échec (token invalide/révoqué), on nettoie les cookies et lève l'exception 401
       clearAuthCookies(res);
-      throw new UnauthorizedException(AuthErrors.SESSION_EXPIRED_INVALID);
+      throw new UnauthorizedException(AuthErrors.REFRESH_FAILED);
     }
   }
 
