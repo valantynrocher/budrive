@@ -2,9 +2,11 @@ import { z } from "zod";
 import { AuthErrors } from "./messages";
 import { emailValidation, passwordValidation } from "./utils";
 
-/**
- * AuthCredentials
- */
+/** ===========================
+ * REQUEST SCHEMAS
+============================ */
+
+/** AuthCredentials */
 export const AuthCredentialsSchema = z.object({
   email: emailValidation,
   password: passwordValidation,
@@ -12,9 +14,7 @@ export const AuthCredentialsSchema = z.object({
 
 export type AuthCredentialsDto = z.infer<typeof AuthCredentialsSchema>;
 
-/**
- * SignUp
- */
+/** SignUp */
 export const SignUpSchema = AuthCredentialsSchema.extend({
   confirmPassword: passwordValidation,
   fullName: z.string().optional(),
@@ -25,34 +25,26 @@ export const SignUpSchema = AuthCredentialsSchema.extend({
 
 export type SignUpDto = z.infer<typeof SignUpSchema>;
 
-/**
- * SignIn
- */
+/** SignIn */
 export const SignInSchema = AuthCredentialsSchema;
 
 export type SignInDto = z.infer<typeof SignInSchema>;
 
-/**
- * Confirm
- */
+/** Confirm */
 export const ConfirmSchema = z.object({
   token: z.string().nonempty(AuthErrors.TOKEN_REQUIRED),
 });
 
 export type ConfirmDto = z.infer<typeof ConfirmSchema>;
 
-/**
- * ForgotPassword
- */
+/** ForgotPassword */
 export const ForgotPwdSchema = z.object({
   email: emailValidation,
 });
 
 export type ForgotPwdDto = z.infer<typeof ForgotPwdSchema>;
 
-/**
- * ResetPassword
- */
+/** ResetPassword */
 export const ResetPwdSchema = z
   .object({
     token: z.string().nonempty(AuthErrors.TOKEN_REQUIRED),
@@ -65,3 +57,22 @@ export const ResetPwdSchema = z
   });
 
 export type ResetPwdDto = z.infer<typeof ResetPwdSchema>;
+
+/** ===========================
+ * RESPONSE SCHEMAS
+============================ */
+
+/** Onboarding */
+export type OnboardingStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
+
+/** AuthResponse */
+export type AuthResponseDto = {
+  success: true;
+  message?: string;
+};
+
+/** AuthResponseOnboarding */
+export type OnboardingInfosDto = {
+  onboardingStatus: OnboardingStatus;
+  onboardingStep: number;
+};

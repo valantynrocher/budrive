@@ -1,3 +1,9 @@
+export enum OnboardingStatus {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+}
+
 export class User {
   private id: string;
   private email: string;
@@ -7,26 +13,32 @@ export class User {
   private hashedRefreshToken: string | null;
   private createdAt: Date;
   private updatedAt: Date;
+  private onboardingStatus: OnboardingStatus;
+  private onboardingStep: number;
 
   // IMPORTANT: Mappage des champs de Prisma vers l'entité
   constructor(data: {
     id: string;
     email: string;
     passwordHash: string;
-    fullName: string | null;
-    isVerified: boolean;
-    hashedRefreshToken: string | null;
-    createdAt: Date;
-    updatedAt: Date | null;
+    fullName?: string | null;
+    isVerified?: boolean;
+    hashedRefreshToken?: string | null;
+    createdAt?: Date;
+    updatedAt?: Date | null;
+    onboardingStatus?: OnboardingStatus;
+    onboardingStep?: number;
   }) {
     this.id = data.id;
     this.email = data.email;
     this.passwordHash = data.passwordHash;
-    this.fullName = data.fullName;
-    this.isVerified = data.isVerified;
-    this.hashedRefreshToken = data.hashedRefreshToken;
-    this.createdAt = data.createdAt;
-    this.updatedAt = data.updatedAt || data.createdAt;
+    this.fullName = data.fullName || null;
+    this.isVerified = data.isVerified || false;
+    this.hashedRefreshToken = data.hashedRefreshToken || null;
+    this.createdAt = data.createdAt || new Date(Date.now());
+    this.updatedAt = data.updatedAt || this.createdAt;
+    this.onboardingStatus = data.onboardingStatus ?? OnboardingStatus.PENDING;
+    this.onboardingStep = data.onboardingStep ?? 0;
   }
 
   // --- Getters (Accesseurs) ---
@@ -54,8 +66,14 @@ export class User {
   public getUpdatedt(): Date | null {
     return this.updatedAt;
   }
+  public getOnboardingStatus(): OnboardingStatus {
+    return this.onboardingStatus;
+  }
+  public getOnboardingStep(): number {
+    return this.onboardingStep;
+  }
 
-  // --- Méthodes Métier (Mutateurs d'état) ---
+  // --- Méthodes Métier ---
   public verify(): void {
     if (this.isVerified) {
       // Optionnel: lever une erreur si déjà vérifié
@@ -70,5 +88,18 @@ export class User {
 
   public setRefreshTokenHash(hash: string | null): void {
     this.hashedRefreshToken = hash;
+  }
+
+  public isOnboardingCompleted(): boolean {
+    return this.onboardingStatus === OnboardingStatus.COMPLETED;
+  }
+
+  public updateOnboardingStep(step: number): void {
+    this.onboardingStep = step;
+    this.onboardingStatus = OnboardingStatus.IN_PROGRESS;
+  }
+
+  public completeOnboarding(): void {
+    this.onboardingStatus = OnboardingStatus.COMPLETED;
   }
 }

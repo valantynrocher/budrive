@@ -1,12 +1,14 @@
 import { ZodValidationPipe } from "@/shared/infrastructure/common/zod/zod-validation.pipe";
 import {
   AuthErrors,
+  type AuthResponseDto,
   AuthSuccess,
   AuthToken,
   type ConfirmDto,
   ConfirmSchema,
   type ForgotPwdDto,
   ForgotPwdSchema,
+  type OnboardingInfosDto,
   type ResetPwdDto,
   ResetPwdSchema,
   type SignInDto,
@@ -43,15 +45,23 @@ export class AuthController {
   @Post("sign-up")
   async signUp(
     @Body(new ZodValidationPipe(SignUpSchema)) signUpDto: SignUpDto,
-  ) {
-    return this.authService.signUp(signUpDto);
+  ): Promise<AuthResponseDto & OnboardingInfosDto> {
+    const { onboardingStatus, onboardingStep } =
+      await this.authService.signUp(signUpDto);
+
+    return {
+      success: true,
+      message: AuthSuccess.SIGN_UP,
+      onboardingStatus,
+      onboardingStep,
+    };
   }
 
   @Post("confirm")
   async confirm(
     @Body(new ZodValidationPipe(ConfirmSchema)) confirmDto: ConfirmDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const { accessToken, refreshToken } =
       await this.authService.confirm(confirmDto);
 
@@ -67,8 +77,8 @@ export class AuthController {
   async signIn(
     @Body(new ZodValidationPipe(SignInSchema)) signInDto: SignInDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
-    const { accessToken, refreshToken } =
+  ): Promise<AuthResponseDto & OnboardingInfosDto> {
+    const { accessToken, refreshToken, onboardingStatus, onboardingStep } =
       await this.authService.signIn(signInDto);
 
     setAuthCookies(res, accessToken, refreshToken);
@@ -76,6 +86,8 @@ export class AuthController {
     return {
       success: true,
       message: AuthSuccess.SIGN_IN,
+      onboardingStatus,
+      onboardingStep,
     };
   }
 
@@ -83,7 +95,7 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const refreshToken = req.cookies[AuthToken.REFRESH_TOKEN_COOKIE_NAME];
 
     if (!refreshToken) {
@@ -119,7 +131,10 @@ export class AuthController {
 
   @Post("logout")
   @UseGuards(JwtAuthGuard)
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
     // Le contrôleur récupère l'ID utilisateur du contexte d'exécution (Guard)
     const userId = req.user!.sub;
 
@@ -135,23 +150,33 @@ export class AuthController {
   @Post("forgot-password")
   async forgotPassword(
     @Body(new ZodValidationPipe(ForgotPwdSchema)) credentials: ForgotPwdDto,
-  ) {
-    return this.authService.forgotPassword(credentials);
+  ): Promise<AuthResponseDto> {
+    await this.authService.forgotPassword(credentials);
+
+    return {
+      success: true,
+    };
   }
 
   @Get("verify-reset-token")
-  async verifyResetToken(@Query("token") token: string) {
+  async verifyResetToken(
+    @Query("token") token: string,
+  ): Promise<AuthResponseDto> {
     await this.authService.verifyResetToken(token);
 
     return {
-      status: "ok",
+      success: true,
     };
   }
 
   @Post("reset-password")
   async resetPassword(
     @Body(new ZodValidationPipe(ResetPwdSchema)) credentials: ResetPwdDto,
-  ) {
-    return await this.authService.resetPassword(credentials);
+  ): Promise<AuthResponseDto> {
+    await this.authService.resetPassword(credentials);
+
+    return {
+      success: true,
+    };
   }
 }

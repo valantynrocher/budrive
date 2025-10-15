@@ -24,6 +24,8 @@ model User {
   isVerified              Boolean                   @default(false)
   hashedRefreshToken      String?
   passwordResetToken      PasswordResetToken?
+  onboardingStatus        OnboardingStatus          @default(PENDING)
+  onboardingStep          Int                       @default(0) // 0: Non commencé
   @@map("users")
 }
 
@@ -42,4 +44,10 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime
+}
+
+enum OnboardingStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
 }

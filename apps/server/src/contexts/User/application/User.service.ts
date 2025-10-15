@@ -28,7 +28,6 @@ export class UserService {
     passwordHash: string;
     fullName?: string | null;
   }): Promise<User> {
-    // 2. Le service d'application appelle le repository pour la création
     return this.userRepository.create(data);
   }
 

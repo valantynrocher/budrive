@@ -1,12 +1,13 @@
 import { TokenManagementService } from "@/contexts/Auth/application/TokenManagement.service";
+import { UserService } from "@/contexts/User/application/User.service";
 import { MailService } from "@/infrastructure/services/mail/mail.service";
 import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
-import { UserService } from "@/contexts/User/application/User.service";
 import {
   AuthErrors,
-  ResetPwdDto,
   type ConfirmDto,
   type ForgotPwdDto,
+  type OnboardingInfosDto,
+  type ResetPwdDto,
   type SignInDto,
   type SignUpDto,
 } from "@budrive/validation";
@@ -19,6 +20,11 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 
+type SessionTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -29,7 +35,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
   ) {}
 
-  private async generateTokens(userId: string) {
+  private async generateTokens(userId: string): Promise<SessionTokens> {
     const [accessToken, refreshToken] = await Promise.all([
       // Access Token
       this.jwtService.signAsync(
@@ -64,7 +70,7 @@ export class AuthService {
     return passwordHash;
   }
 
-  async signUp(credentials: SignUpDto) {
+  async signUp(credentials: SignUpDto): Promise<OnboardingInfosDto> {
     const existingUser = await this.userService.findUserByEmail(
       credentials.email,
     );
@@ -95,13 +101,14 @@ export class AuthService {
     );
 
     return {
-      id: user.getId(),
-      email: user.getEmail(),
-      fullName: user.getFullName(),
+      onboardingStatus: user.getOnboardingStatus(),
+      onboardingStep: user.getOnboardingStep(),
     };
   }
 
-  async confirm(payload: ConfirmDto) {
+  async confirm(
+    payload: ConfirmDto,
+  ): Promise<OnboardingInfosDto & SessionTokens> {
     const emailToken =
       await this.tokenManagementService.findEmailVerificationToken(
         payload.token,
@@ -121,10 +128,17 @@ export class AuthService {
     );
     await this.updateRefreshToken(user.getId(), refreshToken);
 
-    return { accessToken, refreshToken };
+    return {
+      accessToken,
+      refreshToken,
+      onboardingStatus: user.getOnboardingStatus(),
+      onboardingStep: user.getOnboardingStep(),
+    };
   }
 
-  async signIn(credentials: SignInDto) {
+  async signIn(
+    credentials: SignInDto,
+  ): Promise<OnboardingInfosDto & SessionTokens> {
     const user = await this.userService.findUserByEmail(credentials.email);
 
     if (!user) {
@@ -145,10 +159,18 @@ export class AuthService {
     );
     await this.updateRefreshToken(user.getId(), refreshToken);
 
-    return { accessToken, refreshToken };
+    return {
+      accessToken,
+      refreshToken,
+      onboardingStatus: user.getOnboardingStatus(),
+      onboardingStep: user.getOnboardingStep(),
+    };
   }
 
-  async refreshTokens(userId: string, oldRefreshToken: string) {
+  async refreshTokens(
+    userId: string,
+    oldRefreshToken: string,
+  ): Promise<OnboardingInfosDto & SessionTokens> {
     const user = await this.userService.findUserById(userId);
 
     if (!user || !user.getHashedRefreshToken()) {
@@ -175,7 +197,12 @@ export class AuthService {
     // 3. Stockage du hachage du NOUVEAU Refresh Token (Rotation des Tokens)
     await this.updateRefreshToken(user.getId(), newRefreshToken);
 
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      onboardingStatus: user.getOnboardingStatus(),
+      onboardingStep: user.getOnboardingStep(),
+    };
   }
 
   async logout(userId: string) {
@@ -238,8 +265,7 @@ export class AuthService {
       // 4. Actions Post-Transaction (Si tout a réussi)
       await this.mailService.sendPasswordResetConfirm(updatedUser.email);
 
-      const { passwordHash: _ph, ...safeUser } = updatedUser;
-      return safeUser;
+      return;
     } catch (error) {
       // rollback
       console.error(
