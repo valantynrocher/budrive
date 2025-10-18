@@ -1,22 +1,12 @@
 import { JwtAuthGuard } from "@/contexts/Auth/infrastructure/guards/JwtAuth.guard";
 import { OnboardingService } from "@/contexts/User/application/Onboarding.service";
 import { ZodValidationPipe } from "@/shared/infrastructure/common/zod/zod-validation.pipe";
-import {
-  Body,
-  Controller,
-  Get,
-  Logger,
-  Post,
-  Query,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from "@nestjs/common";
-import { type Request, type Response } from "express";
+import { type Step1VehicleDto, Step1VehicleSchema } from "@budrive/validation";
+import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
+import { type Request } from "express";
 
 @UseGuards(JwtAuthGuard) // Tous les endpoints nécessitent une authentification
-@Controller("user-onboarding")
+@Controller("onboarding")
 export class OnboardingController {
   constructor(private readonly onboardingService: OnboardingService) {}
 
@@ -25,7 +15,10 @@ export class OnboardingController {
    * Valide les données d'identification du véhicule et passe à l'étape 2.
    */
   @Post("step-1")
-  async postStep1(@Req() req: Request, @Body() step1Dto: any) {
+  async postStep1(
+    @Req() req: Request,
+    @Body(new ZodValidationPipe(Step1VehicleSchema)) step1Dto: Step1VehicleDto,
+  ) {
     const userId = req.user!.sub;
 
     // Le service gère l'orchestration (création du véhicule, mise à jour de l'état utilisateur)

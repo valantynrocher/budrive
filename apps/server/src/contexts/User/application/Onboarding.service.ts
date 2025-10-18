@@ -1,4 +1,5 @@
 import { UserService } from "@/contexts/User/application/User.service";
+import { VehicleService } from "@/contexts/Vehicle/application/Vehicle.service";
 import { AuthErrors } from "@budrive/validation";
 import {
   BadRequestException,
@@ -8,7 +9,10 @@ import {
 
 @Injectable()
 export class OnboardingService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly vehicleService: VehicleService,
+  ) {}
 
   async completeStep1(
     userId: string,
@@ -25,8 +29,7 @@ export class OnboardingService {
       throw new BadRequestException(AuthErrors.ONBOARDING_ALREADY_COMPLETE);
     }
 
-    // --- LOGIQUE MÉTIER DE L'ÉTAPE 1 (sera ajouté plus tard) ---
-    // Ex: await this.vehicleService.createVehicle(userId, step1Dto);
+    await this.vehicleService.createVehicle(userId, step1Dto);
 
     // 2. Mise à jour de l'état de l'utilisateur
     // Cette méthode doit implémenter : this.onboardingStatus = IN_PROGRESS et this.onboardingStep = 2
