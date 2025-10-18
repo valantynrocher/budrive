@@ -26,6 +26,7 @@ model User {
   passwordResetToken      PasswordResetToken?
   onboardingStatus        OnboardingStatus          @default(PENDING)
   onboardingStep          Int                       @default(0) // 0: Non commencé
+  vehicles                Vehicle[]
   @@map("users")
 }
 
@@ -50,4 +51,31 @@ enum OnboardingStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
+}
+
+enum FuelType {
+  GASOLINE
+  DIESEL
+  ELECTRIC
+  HYBRID
+  OTHER
+}
+
+model Vehicle {
+  // CLÉS PRIMAIRES ET RELATIONS
+  id                  String   @id @default(uuid())
+  userId              String   
+  user                User     @relation(fields: [userId], references: [id])
+  
+  // DONNÉES D'IDENTIFICATION (Étape 1 Onboarding)
+  make                String
+  model               String
+  mileage             Int
+  licensePlate        String   @unique
+  yearOfCirculation   Int
+  fuelType            FuelType
+
+  // METADONNÉES
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
