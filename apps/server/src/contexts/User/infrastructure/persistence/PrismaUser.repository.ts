@@ -1,9 +1,11 @@
-import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
 import {
   IUserRepository,
   User,
   UserCreationData,
-} from "@/contexts/User/domain"; // Importe du Domain
+  OnboardingStatus,
+} from "@/contexts/User/domain";
+import type { UserEntityProps } from "@/contexts/User/domain/User.entity";
+import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
 import { Injectable } from "@nestjs/common";
 import type { User as PrismaUser } from "@prisma/client";
 
@@ -13,7 +15,20 @@ export class PrismaUserRepository implements IUserRepository {
 
   // Fonction utilitaire pour convertir le type Prisma en Entity DDD
   private toDomain(prismaRecord: PrismaUser): User {
-    return new User(prismaRecord);
+    const domainProps: UserEntityProps = {
+      id: prismaRecord.id,
+      email: prismaRecord.email,
+      passwordHash: prismaRecord.passwordHash,
+      fullName: prismaRecord.fullName,
+      isVerified: prismaRecord.isVerified,
+      hashedRefreshToken: prismaRecord.hashedRefreshToken,
+      createdAt: prismaRecord.createdAt,
+      updatedAt: prismaRecord.updatedAt,
+      onboardingStatus: prismaRecord.onboardingStatus as OnboardingStatus,
+      onboardingStep: prismaRecord.onboardingStep as number,
+    };
+
+    return User.fromPersistence(domainProps);
   }
 
   async findById(id: string): Promise<User | null> {

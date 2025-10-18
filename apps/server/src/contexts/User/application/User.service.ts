@@ -59,10 +59,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async updatePasswordHash(
-    id: User["id"],
-    passwordHash: string,
-  ): Promise<User> {
+  async updatePasswordHash(id: string, passwordHash: string): Promise<User> {
     const user = await this.userRepository.findById(id);
 
     if (!user) {
@@ -71,6 +68,11 @@ export class UserService {
 
     user.updatePassword(passwordHash);
 
+    return this.userRepository.save(user);
+  }
+
+  /* istanbul ignore next */
+  async save(user: User): Promise<User> {
     return this.userRepository.save(user);
   }
 }

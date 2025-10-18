@@ -1,105 +1,124 @@
-export enum OnboardingStatus {
-  PENDING = "PENDING",
-  IN_PROGRESS = "IN_PROGRESS",
-  COMPLETED = "COMPLETED",
+import { OnboardingStatus } from "@budrive/validation";
+
+interface UserMinimalProps {
+  email: string;
+  passwordHash: string;
+}
+
+export interface UserEntityProps extends UserMinimalProps {
+  id: string;
+  fullName: string | null;
+  isVerified: boolean;
+  hashedRefreshToken: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  onboardingStatus: OnboardingStatus;
+  onboardingStep: number;
 }
 
 export class User {
-  private id: string;
-  private email: string;
-  private passwordHash: string;
-  private fullName: string | null;
-  private isVerified: boolean;
-  private hashedRefreshToken: string | null;
-  private createdAt: Date;
-  private updatedAt: Date;
-  private onboardingStatus: OnboardingStatus;
-  private onboardingStep: number;
+  private props: UserEntityProps;
 
-  // IMPORTANT: Mappage des champs de Prisma vers l'entité
-  constructor(data: {
-    id: string;
-    email: string;
-    passwordHash: string;
-    fullName?: string | null;
-    isVerified?: boolean;
-    hashedRefreshToken?: string | null;
-    createdAt?: Date;
-    updatedAt?: Date | null;
-    onboardingStatus?: OnboardingStatus;
-    onboardingStep?: number;
-  }) {
-    this.id = data.id;
-    this.email = data.email;
-    this.passwordHash = data.passwordHash;
-    this.fullName = data.fullName || null;
-    this.isVerified = data.isVerified || false;
-    this.hashedRefreshToken = data.hashedRefreshToken || null;
-    this.createdAt = data.createdAt || new Date(Date.now());
-    this.updatedAt = data.updatedAt || this.createdAt;
-    this.onboardingStatus = data.onboardingStatus ?? OnboardingStatus.PENDING;
-    this.onboardingStep = data.onboardingStep ?? 0;
+  private constructor(props: UserEntityProps) {
+    this.props = props;
+  }
+
+  private setUpdatedAt() {
+    this.props.updatedAt = new Date();
+  }
+
+  public static create(data: UserMinimalProps): User {
+    const now = new Date();
+    const initialProps: UserEntityProps = {
+      id: "tempo",
+      email: data.email,
+      passwordHash: data.passwordHash,
+      fullName: null,
+      isVerified: false,
+      hashedRefreshToken: null,
+      createdAt: now,
+      updatedAt: now,
+      onboardingStatus: OnboardingStatus.PENDING,
+      onboardingStep: 0,
+    };
+
+    return new User(initialProps);
+  }
+
+  public static fromPersistence(props: UserEntityProps): User {
+    // Aucune logique métier ou valeur par défaut n'est appliquée ici.
+    return new User(props);
+  }
+
+  public toPrimitives(): UserEntityProps {
+    return { ...this.props };
   }
 
   // --- Getters (Accesseurs) ---
   public getId(): string {
-    return this.id;
+    return this.props.id;
   }
   public getEmail(): string {
-    return this.email;
+    return this.props.email;
   }
   public getPasswordHash(): string {
-    return this.passwordHash;
+    return this.props.passwordHash;
   }
   public isVerifiedUser(): boolean {
-    return this.isVerified;
+    return this.props.isVerified;
   }
   public getHashedRefreshToken(): string | null {
-    return this.hashedRefreshToken;
+    return this.props.hashedRefreshToken;
   }
   public getFullName(): string | null {
-    return this.fullName;
+    return this.props.fullName;
   }
   public getCreatedAt(): Date {
-    return this.createdAt;
+    return this.props.createdAt;
   }
-  public getUpdatedt(): Date | null {
-    return this.updatedAt;
+  public getUpdatedt(): Date {
+    return this.props.updatedAt;
   }
   public getOnboardingStatus(): OnboardingStatus {
-    return this.onboardingStatus;
+    return this.props.onboardingStatus;
   }
   public getOnboardingStep(): number {
-    return this.onboardingStep;
+    return this.props.onboardingStep;
   }
 
   // --- Méthodes Métier ---
   public verify(): void {
-    if (this.isVerified) {
+    if (this.props.isVerified) {
       // Optionnel: lever une erreur si déjà vérifié
       return;
     }
-    this.isVerified = true;
+    this.props.isVerified = true;
+    this.setUpdatedAt();
   }
 
   public updatePassword(newPasswordHash: string): void {
-    this.passwordHash = newPasswordHash;
+    this.props.passwordHash = newPasswordHash;
+    this.setUpdatedAt();
   }
 
   public setRefreshTokenHash(hash: string | null): void {
-    this.hashedRefreshToken = hash;
+    this.props.hashedRefreshToken = hash;
+    this.setUpdatedAt();
   }
 
   public isOnboardingCompleted(): boolean {
-    return this.onboardingStatus === OnboardingStatus.COMPLETED;
+    return this.props.onboardingStatus === OnboardingStatus.COMPLETED;
+    this.setUpdatedAt();
   }
 
   public updateOnboardingStep(step: number): void {
-    this.onboardingStep = step;
-    this.onboardingStatus = OnboardingStatus.IN_PROGRESS;
+    this.props.onboardingStep = step;
+    this.props.onboardingStatus = OnboardingStatus.IN_PROGRESS;
+    this.setUpdatedAt();
   }
 
   public completeOnboarding(): void {
-    this.onboardingStatus = OnboardingStatus.COMPLETED;
+    this.props.onboardingStatus = OnboardingStatus.COMPLETED;
+    this.setUpdatedAt();
   }
 }
