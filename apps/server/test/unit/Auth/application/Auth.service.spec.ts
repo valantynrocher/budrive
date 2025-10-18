@@ -1,11 +1,11 @@
-import { AuthService } from "@/auth/application/auth.service";
-import { TokenManagementService } from "@/auth/application/token-management.service";
+import { AuthService } from "@/contexts/Auth/application/Auth.service";
+import { TokenManagementService } from "@/contexts/Auth/application/TokenManagement.service";
 import { MailService } from "@/infrastructure/services/mail/mail.service";
 import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
-import { UsersService } from "@/users/application/users.service";
-import { User } from "@/users/domain/User.entity";
+import { UserService } from "@/contexts/User/application/User.service";
+import { User } from "@/contexts/User/domain/User.entity";
 import {
-  AuthToken,
+  OnboardingStatus,
   SignInDto,
   SignUpDto,
   type ConfirmDto,
@@ -69,7 +69,7 @@ const MOCK_PASSWORD_HASH = "hashed_password123";
 const MOCK_REFRESH_TOKEN = "mock-refresh-token";
 const MOCK_ACCESS_TOKEN = "mock-access-token";
 
-const mockUserEntity = new User({
+const mockUserEntity = User.fromPersistence({
   id: MOCK_USER_ID,
   email: MOCK_USER_EMAIL,
   passwordHash: MOCK_PASSWORD_HASH,
@@ -78,10 +78,12 @@ const mockUserEntity = new User({
   fullName: null,
   createdAt: new Date(Date.now()),
   updatedAt: new Date(Date.now()),
+  onboardingStatus: OnboardingStatus.PENDING,
+  onboardingStep: 0,
 });
 
 // Étendre l'entité avec un hash de refresh token
-const mockUserWithRefreshToken = new User({
+const mockUserWithRefreshToken = User.fromPersistence({
   id: mockUserEntity.getId(),
   email: mockUserEntity.getEmail(),
   passwordHash: mockUserEntity.getPasswordHash(),
@@ -90,6 +92,8 @@ const mockUserWithRefreshToken = new User({
   createdAt: mockUserEntity.getCreatedAt(),
   updatedAt: mockUserEntity.getUpdatedt(),
   hashedRefreshToken: "hashed_refresh_token",
+  onboardingStatus: OnboardingStatus.PENDING,
+  onboardingStep: 0,
 });
 
 describe("AuthService (Application Layer)", () => {
@@ -104,7 +108,7 @@ describe("AuthService (Application Layer)", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: UsersService, useValue: mockUsersService },
+        { provide: UserService, useValue: mockUsersService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: MailService, useValue: mockMailService },
         {
@@ -228,7 +232,7 @@ describe("AuthService (Application Layer)", () => {
         .spyOn(service as any, "createPasswordHash")
         .mockResolvedValue(MOCK_PASSWORD_HASH);
 
-      const result = await service.signUp(signUpDto as SignUpDto);
+      const result = await service.signUp(signUpDto);
 
       // Assertions sur l'orchestration
       expect(mockUsersService.findUserByEmail).toHaveBeenCalledWith(
@@ -249,16 +253,15 @@ describe("AuthService (Application Layer)", () => {
 
       // Assertion sur le retour
       expect(result).toEqual({
-        id: MOCK_USER_ID,
-        email: MOCK_USER_EMAIL,
-        fullName: null,
+        onboardingStatus: OnboardingStatus.PENDING,
+        onboardingStep: 0,
       });
     });
 
     it("→ should throw ConflictException if user already exists", async () => {
       mockUsersService.findUserByEmail.mockResolvedValue(mockUserEntity);
 
-      await expect(service.signUp(signUpDto as SignUpDto)).rejects.toThrow(
+      await expect(service.signUp(signUpDto)).rejects.toThrow(
         ConflictException,
       );
       expect(mockUsersService.registerUser).not.toHaveBeenCalled();
@@ -312,6 +315,8 @@ describe("AuthService (Application Layer)", () => {
       expect(result).toEqual({
         accessToken: MOCK_ACCESS_TOKEN,
         refreshToken: MOCK_REFRESH_TOKEN,
+        onboardingStatus: OnboardingStatus.PENDING,
+        onboardingStep: 0,
       });
     });
 
@@ -434,7 +439,7 @@ describe("AuthService (Application Layer)", () => {
 
     it("→ should throw UnauthorizedException if user has no session (hashed token is null)", async () => {
       // Préparation: L'utilisateur est trouvé, mais sans refreshTokenHash
-      const userWithoutToken = new User({
+      const userWithoutToken = User.fromPersistence({
         id: mockUserEntity.getId(),
         email: mockUserEntity.getEmail(),
         passwordHash: mockUserEntity.getPasswordHash(),
@@ -443,7 +448,9 @@ describe("AuthService (Application Layer)", () => {
         createdAt: mockUserEntity.getCreatedAt(),
         updatedAt: mockUserEntity.getUpdatedt(),
         hashedRefreshToken: null,
-      });
+        onboardingStatus: OnboardingStatus.PENDING,
+        onboardingStep: 0,
+      } as any);
       mockUsersService.findUserById.mockResolvedValue(userWithoutToken);
 
       await expect(

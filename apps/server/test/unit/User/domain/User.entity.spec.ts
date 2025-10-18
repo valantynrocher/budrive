@@ -1,5 +1,5 @@
-import { OnboardingStatus, User } from "@/contexts/User/domain/User.entity";
-import { beforeEach } from "node:test";
+import { User } from "@/contexts/User/domain/User.entity";
+import { OnboardingStatus } from "@budrive/validation";
 
 describe("User Entity (Domain rules)", () => {
   let user: User;
@@ -11,14 +11,13 @@ describe("User Entity (Domain rules)", () => {
   };
 
   beforeAll(() => {
-    user = new User(baseUserMock);
+    user = User.create({
+      email: baseUserMock.email,
+      passwordHash: baseUserMock.passwordHash,
+    });
   });
 
-  describe("User Entity constructor", () => {
-    it("→ user should be defined when a User instance is created", () => {
-      expect(user).toBeDefined();
-    });
-
+  describe("create method", () => {
     it("should initialize a new user with PENDING status and step 0 by default", () => {
       expect(user.getOnboardingStatus()).toBe(OnboardingStatus.PENDING);
       expect(user.getOnboardingStep()).toBe(0);
@@ -74,11 +73,16 @@ describe("User Entity (Domain rules)", () => {
     });
 
     it("should set onboarding status to COMPLETED and return true for isOnboardingCompleted", () => {
-      const user = new User({
+      const user = User.fromPersistence({
         ...baseUserMock,
         onboardingStatus: OnboardingStatus.IN_PROGRESS,
         onboardingStep: 2,
-      });
+        fullName: null,
+        isVerified: true,
+        hashedRefreshToken: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
 
       user.completeOnboarding();
 
