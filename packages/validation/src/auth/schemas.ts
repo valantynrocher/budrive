@@ -63,7 +63,13 @@ export type ResetPwdDto = z.infer<typeof ResetPwdSchema>;
 ============================ */
 
 /** Onboarding */
-export type OnboardingStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
+export enum OnboardingStatus {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+}
+
+export const OnboardingStatusSchema = z.nativeEnum(OnboardingStatus);
 
 /** AuthResponse */
 export type AuthResponseDto = {
@@ -72,7 +78,8 @@ export type AuthResponseDto = {
 };
 
 /** AuthResponseOnboarding */
-export type OnboardingInfosDto = {
-  onboardingStatus: OnboardingStatus;
-  onboardingStep: number;
-};
+export const OnboardingInfosSchema = z.object({
+  onboardingStatus: OnboardingStatusSchema,
+  onboardingStep: z.number(),
+});
+export type OnboardingInfosDto = z.infer<typeof OnboardingInfosSchema>;

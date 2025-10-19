@@ -1,0 +1,72 @@
+# -----------------------------------------------
+# 1. FICHIERS ET DOSSIERS DE BUILD/CACHE/DEPENDANCES
+#    (L'IA n'a pas besoin de les lire)
+# -----------------------------------------------
+
+# Dossiers générés par pnpm / node
+/node_modules
+/apps/*/node_modules
+/packages/*/node_modules
+
+# Dossiers et fichiers de cache/build
+.turbo/
+.next/
+dist/
+build/
+coverage/
+
+# Sortie de compilation TypeScript (souvent redondante avec le .ts)
+# Si vous utilisez `outDir` dans tsconfig.json pour compiler en JS:
+# **/*.js
+# **/*.d.ts
+
+# -----------------------------------------------
+# 2. FICHIERS DE CONFIGURATION CONTENANT DES SECRETS
+#    (Zone de risque critique)
+# -----------------------------------------------
+
+# Variables d'environnement (contiennent clés API Supabase, secrets, etc.)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+
+# Fichiers de configuration de l'éditeur ou du projet non essentiels
+.vscode/
+.idea/
+
+# -----------------------------------------------
+# 3. FICHIERS DE LOGS, BASES DE DONNÉES LOCALES ET TEMP
+#    (Contiennent potentiellement des données utilisateurs ou de debug)
+# -----------------------------------------------
+
+# Fichiers de logs
+*.log
+logs/
+
+# Bases de données locales (si vous utilisez une BD sqlite/Postgres locale)
+*.sqlite
+*.sqlite3
+*.db
+/apps/backend/*.sql
+
+# Fichiers temporaires ou de dump
+*.tmp
+*.bak
+*.dump
+
+# -----------------------------------------------
+# 4. FICHIERS SENSIBLES LIÉS À GIT/OS
+# -----------------------------------------------
+
+.git/
+
+# -----------------------------------------------
+# 5. AJOUTS SPÉCIFIQUES À VOTRE STACK
+# -----------------------------------------------
+
+# Si vous avez un fichier de configuration Supabase avec des clés
+supabase/config.json
+supabase/secrets/
