@@ -6,13 +6,12 @@ import Box from "@mui/material/Box";
 import { DashboardLayoutProps } from "./props";
 
 const DashboardLayoutComponent = (props: DashboardLayoutProps) => {
-  const { children } = props;
+  const { children, withNavigation = true } = props;
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
-      <Appbar />
+      <Appbar withNavigation />
 
-      {/* MobileAppDrawer is rendered inside AppBar */}
-      <DesktopAppDrawer />
+      {withNavigation ? <DesktopAppDrawer /> : null}
 
       <Box
         component="main"

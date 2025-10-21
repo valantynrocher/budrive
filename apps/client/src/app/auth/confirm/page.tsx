@@ -37,10 +37,14 @@ const ConfirmPage = () => {
           body: JSON.stringify({ token }),
         });
 
-        const handlerBody = await handlerResponse.json();
+        const handlerBody =
+          (await handlerResponse.json()) as ConfirmResponseDto;
 
         if (handlerResponse.ok) {
-          router.replace("/dashboard");
+          if (handlerBody.onboardingStatus === OnboardingStatus.COMPLETED)
+            router.replace("/dashboard");
+
+          router.replace("/onboarding");
         } else {
           const errorMessage =
             handlerBody.message || AuthErrors.CONFIRM_TOKEN_UNKNOW_ERROR;

@@ -44,7 +44,13 @@ async function signinServerAction(
     return response;
   }
 
-  redirect("/dashboard");
+  const body = (await res.json().catch(() => ({}))) as SignInResponseDto;
+
+  if (body.onboardingStatus === OnboardingStatus.COMPLETED) {
+    redirect("/dashboard");
+  }
+
+  redirect("/onboarding");
 }
 
 export default signinServerAction;

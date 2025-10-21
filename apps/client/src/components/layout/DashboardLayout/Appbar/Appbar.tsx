@@ -11,8 +11,11 @@ import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import { useState } from "react";
 import MobileAppDrawer from "./MobileAppDrawer";
+import { AppbarProps } from "./props";
 
-const Appbar = () => {
+const Appbar = (props: AppbarProps) => {
+  const { withNavigation } = props;
+
   const [open, setOpen] = useState(false);
   const { logout } = useSession();
 
@@ -57,25 +60,27 @@ const Appbar = () => {
         >
           <BudriveIcon sx={{ display: { xs: "none", md: "initial" } }} />
 
-          <MenuButton
-            sx={{
-              display: { xs: "auto", md: "none" },
-              bgcolor: "secondary.main",
-              color: "secondary.dark",
-              borderRadius: 1,
-              p: 1,
-              "&:hover": {
-                backgroundColor: "secondary.dark",
-                "& svg": {
-                  color: "secondary.light",
+          {withNavigation ? (
+            <MenuButton
+              sx={{
+                display: { xs: "auto", md: "none" },
+                bgcolor: "secondary.main",
+                color: "secondary.dark",
+                borderRadius: 1,
+                p: 1,
+                "&:hover": {
+                  backgroundColor: "secondary.dark",
+                  "& svg": {
+                    color: "secondary.light",
+                  },
                 },
-              },
-            }}
-            aria-label="menu"
-            onClick={toggleDrawer(true)}
-          >
-            <MenuRoundedIcon fontSize="small" />
-          </MenuButton>
+              }}
+              aria-label="menu"
+              onClick={toggleDrawer(true)}
+            >
+              <MenuRoundedIcon fontSize="small" />
+            </MenuButton>
+          ) : null}
         </Stack>
 
         {/* Right area */}
