@@ -14,28 +14,41 @@ export class OnboardingService {
     private readonly vehicleService: VehicleService,
   ) {}
 
-  async completeStep1(
-    userId: string,
-    step1Dto: any, // TODO
-  ): Promise<void> {
-    // 1. Récupération de l'utilisateur pour vérification
+  private async checkUser(userId: string) {
+    // Récupération de l'utilisateur pour vérification
     const user = await this.userService.findUserById(userId);
 
     if (!user) {
-      // Gérer l'erreur (p. ex., lancer une BadRequestException)
       throw new UnauthorizedException(AuthErrors.USER_NOT_FOUND);
     }
     if (user.isOnboardingCompleted()) {
       throw new BadRequestException(AuthErrors.ONBOARDING_ALREADY_COMPLETE);
     }
 
+    return user;
+  }
+
+  async skip(userId: string): Promise<void> {
+    const user = await this.checkUser(userId);
+
+    user.skipOnboarding();
+
+    await this.userService.save(user);
+  }
+
+  async completeStep1(
+    userId: string,
+    step1Dto: any, // TODO
+  ): Promise<void> {
+    const user = await this.checkUser(userId);
+
+    // Création du véhicule
     await this.vehicleService.createVehicle(userId, step1Dto);
 
-    // 2. Mise à jour de l'état de l'utilisateur
-    // Cette méthode doit implémenter : this.onboardingStatus = IN_PROGRESS et this.onboardingStep = 2
+    // Mise à jour de l'état de l'utilisateur
     user.updateOnboardingStep(2);
 
-    // 3. Sauvegarde de l'état mis à jour
+    // Sauvegarde de l'état mis à jour
     await this.userService.save(user);
   }
 }

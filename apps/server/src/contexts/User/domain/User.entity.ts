@@ -46,7 +46,6 @@ export class User {
   }
 
   public static fromPersistence(props: UserEntityProps): User {
-    // Aucune logique métier ou valeur par défaut n'est appliquée ici.
     return new User(props);
   }
 
@@ -108,7 +107,6 @@ export class User {
 
   public isOnboardingCompleted(): boolean {
     return this.props.onboardingStatus === OnboardingStatus.COMPLETED;
-    this.setUpdatedAt();
   }
 
   public updateOnboardingStep(step: number): void {
@@ -119,6 +117,11 @@ export class User {
 
   public completeOnboarding(): void {
     this.props.onboardingStatus = OnboardingStatus.COMPLETED;
+    this.setUpdatedAt();
+  }
+
+  public skipOnboarding(): void {
+    this.props.onboardingStatus = OnboardingStatus.SKIPPED;
     this.setUpdatedAt();
   }
 }

@@ -15,6 +15,21 @@ export class OnboardingController {
   constructor(private readonly onboardingService: OnboardingService) {}
 
   /**
+   * POST /onboarding/skip
+   */
+  @Post("skip")
+  async skip(@Req() req: Request): Promise<SuccessResponseDto> {
+    const userId = req.user!.sub;
+
+    await this.onboardingService.skip(userId);
+
+    return {
+      success: true,
+      message: "Onboarding skipped successfully", // TODO: replace by message from @budrive/validation
+    };
+  }
+
+  /**
    * POST /onboarding/step-1
    * Valide les données d'identification du véhicule et passe à l'étape 2.
    */
@@ -30,9 +45,7 @@ export class OnboardingController {
 
     return {
       success: true,
-      message: "Vehicle identification recorded. Proceeding to step 2.",
-      // Nous ne renvoyons PAS l'état complet de l'utilisateur ici,
-      // car le frontend doit le récupérer après re-authentification ou une requête GET /user/me
+      message: "Vehicle identification recorded. Proceeding to step 2.", // TODO: replace by message from @budrive/validation
     };
   }
 
