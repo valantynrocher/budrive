@@ -1,17 +1,18 @@
 import { ZodValidationPipe } from "@/shared/infrastructure/common/zod/zod-validation.pipe";
 import {
   AuthErrors,
-  type AuthResponseDto,
+  type SuccessResponseDto,
   AuthSuccess,
   AuthToken,
   type ConfirmDto,
+  type ConfirmResponseDto,
   ConfirmSchema,
   type ForgotPwdDto,
   ForgotPwdSchema,
-  type OnboardingInfosDto,
   type ResetPwdDto,
   ResetPwdSchema,
   type SignInDto,
+  type SignInResponseDto,
   SignInSchema,
   type SignUpDto,
   SignUpSchema,
@@ -45,15 +46,12 @@ export class AuthController {
   @Post("sign-up")
   async signUp(
     @Body(new ZodValidationPipe(SignUpSchema)) signUpDto: SignUpDto,
-  ): Promise<AuthResponseDto & OnboardingInfosDto> {
-    const { onboardingStatus, onboardingStep } =
-      await this.authService.signUp(signUpDto);
+  ): Promise<SuccessResponseDto> {
+    await this.authService.signUp(signUpDto);
 
     return {
       success: true,
       message: AuthSuccess.SIGN_UP,
-      onboardingStatus,
-      onboardingStep,
     };
   }
 
@@ -61,8 +59,8 @@ export class AuthController {
   async confirm(
     @Body(new ZodValidationPipe(ConfirmSchema)) confirmDto: ConfirmDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
-    const { accessToken, refreshToken } =
+  ): Promise<ConfirmResponseDto> {
+    const { accessToken, refreshToken, onboardingStatus, onboardingStep } =
       await this.authService.confirm(confirmDto);
 
     setAuthCookies(res, accessToken, refreshToken);
@@ -70,6 +68,8 @@ export class AuthController {
     return {
       success: true,
       message: AuthSuccess.CONFIRM,
+      onboardingStatus,
+      onboardingStep,
     };
   }
 
@@ -77,7 +77,7 @@ export class AuthController {
   async signIn(
     @Body(new ZodValidationPipe(SignInSchema)) signInDto: SignInDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto & OnboardingInfosDto> {
+  ): Promise<SignInResponseDto> {
     const { accessToken, refreshToken, onboardingStatus, onboardingStep } =
       await this.authService.signIn(signInDto);
 
@@ -95,7 +95,7 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const refreshToken = req.cookies[AuthToken.REFRESH_TOKEN_COOKIE_NAME];
 
     if (!refreshToken) {
@@ -134,7 +134,7 @@ export class AuthController {
   async logout(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
+  ): Promise<SuccessResponseDto> {
     // Le contrôleur récupère l'ID utilisateur du contexte d'exécution (Guard)
     const userId = req.user!.sub;
 
@@ -150,7 +150,7 @@ export class AuthController {
   @Post("forgot-password")
   async forgotPassword(
     @Body(new ZodValidationPipe(ForgotPwdSchema)) credentials: ForgotPwdDto,
-  ): Promise<AuthResponseDto> {
+  ): Promise<SuccessResponseDto> {
     await this.authService.forgotPassword(credentials);
 
     return {
@@ -161,7 +161,7 @@ export class AuthController {
   @Get("verify-reset-token")
   async verifyResetToken(
     @Query("token") token: string,
-  ): Promise<AuthResponseDto> {
+  ): Promise<SuccessResponseDto> {
     await this.authService.verifyResetToken(token);
 
     return {
@@ -172,7 +172,7 @@ export class AuthController {
   @Post("reset-password")
   async resetPassword(
     @Body(new ZodValidationPipe(ResetPwdSchema)) credentials: ResetPwdDto,
-  ): Promise<AuthResponseDto> {
+  ): Promise<SuccessResponseDto> {
     await this.authService.resetPassword(credentials);
 
     return {

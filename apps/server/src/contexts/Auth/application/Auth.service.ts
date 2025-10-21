@@ -70,7 +70,7 @@ export class AuthService {
     return passwordHash;
   }
 
-  async signUp(credentials: SignUpDto): Promise<OnboardingInfosDto> {
+  async signUp(credentials: SignUpDto): Promise<void> {
     const existingUser = await this.userService.findUserByEmail(
       credentials.email,
     );
@@ -99,11 +99,6 @@ export class AuthService {
       user.getEmail(),
       emailToken.getToken(),
     );
-
-    return {
-      onboardingStatus: user.getOnboardingStatus(),
-      onboardingStep: user.getOnboardingStep(),
-    };
   }
 
   async confirm(

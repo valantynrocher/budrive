@@ -2,9 +2,9 @@ import {
   IUserRepository,
   User,
   UserCreationData,
-  OnboardingStatus,
 } from "@/contexts/User/domain";
 import type { UserEntityProps } from "@/contexts/User/domain/User.entity";
+import { OnboardingStatus } from "@budrive/validation";
 import { PrismaService } from "@/shared/infrastructure/prisma/prisma.service";
 import { Injectable } from "@nestjs/common";
 import type { User as PrismaUser } from "@prisma/client";

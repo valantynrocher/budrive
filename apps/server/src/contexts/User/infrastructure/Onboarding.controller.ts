@@ -1,7 +1,11 @@
 import { JwtAuthGuard } from "@/contexts/Auth/infrastructure/guards/JwtAuth.guard";
 import { OnboardingService } from "@/contexts/User/application/Onboarding.service";
 import { ZodValidationPipe } from "@/shared/infrastructure/common/zod/zod-validation.pipe";
-import { type Step1VehicleDto, Step1VehicleSchema } from "@budrive/validation";
+import {
+  SuccessResponseDto,
+  type Step1VehicleDto,
+  Step1VehicleSchema,
+} from "@budrive/validation";
 import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
 import { type Request } from "express";
 
@@ -18,7 +22,7 @@ export class OnboardingController {
   async postStep1(
     @Req() req: Request,
     @Body(new ZodValidationPipe(Step1VehicleSchema)) step1Dto: Step1VehicleDto,
-  ) {
+  ): Promise<SuccessResponseDto> {
     const userId = req.user!.sub;
 
     // Le service gère l'orchestration (création du véhicule, mise à jour de l'état utilisateur)
