@@ -1,7 +1,11 @@
 "use client";
-import { AuthErrors } from "@budrive/validation";
+import {
+  AuthErrors,
+  OnboardingStatus,
+  type ConfirmResponseDto,
+} from "@budrive/validation";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react"; // 👈 Import de useRef
+import { useEffect, useRef } from "react";
 
 const ConfirmPage = () => {
   const router = useRouter();
