@@ -2,10 +2,6 @@ import { z } from "zod";
 import { AuthErrors } from "./messages";
 import { emailValidation, passwordValidation } from "./utils";
 
-/** ===========================
- * REQUEST SCHEMAS
-============================ */
-
 /** AuthCredentials */
 export const AuthCredentialsSchema = z.object({
   email: emailValidation,
@@ -57,29 +53,3 @@ export const ResetPwdSchema = z
   });
 
 export type ResetPwdDto = z.infer<typeof ResetPwdSchema>;
-
-/** ===========================
- * RESPONSE SCHEMAS
-============================ */
-
-/** Onboarding */
-export enum OnboardingStatus {
-  PENDING = "PENDING",
-  IN_PROGRESS = "IN_PROGRESS",
-  COMPLETED = "COMPLETED",
-}
-
-export const OnboardingStatusSchema = z.nativeEnum(OnboardingStatus);
-
-/** AuthResponse */
-export type AuthResponseDto = {
-  success: true;
-  message?: string;
-};
-
-/** AuthResponseOnboarding */
-export const OnboardingInfosSchema = z.object({
-  onboardingStatus: OnboardingStatusSchema,
-  onboardingStep: z.number(),
-});
-export type OnboardingInfosDto = z.infer<typeof OnboardingInfosSchema>;
