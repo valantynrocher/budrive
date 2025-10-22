@@ -1,8 +1,5 @@
 import { proxyAuthRequest } from "@/lib/api";
-import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { NextRequest } from "next/server";
-
-type SameSiteType = ResponseCookie["sameSite"];
 
 export async function POST(request: NextRequest) {
   const { token } = await request.json();

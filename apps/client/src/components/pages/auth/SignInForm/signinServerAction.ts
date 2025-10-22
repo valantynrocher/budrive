@@ -40,7 +40,7 @@ async function signinServerAction(
       fieldErrors: body.fieldErrors,
       message: body.message ?? "Connexion échouée",
     };
-    console.log("signinServerAction has failed and will respond :", response);
+
     return response;
   }
 

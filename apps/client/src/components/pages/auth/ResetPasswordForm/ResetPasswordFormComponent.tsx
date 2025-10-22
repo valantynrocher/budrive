@@ -33,8 +33,6 @@ const ResetPasswordFormComponent = ({ token }: ResetPasswordFormProps) => {
   const onSubmit = async (data: FormData) => {
     setError(null);
 
-    console.log("ResetPasswordFormComponent > onSubmit", data);
-
     const response = await resetPwdServerAction(data, token);
     if (!response.success && response.message) {
       setError(response.message);

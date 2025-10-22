@@ -25,7 +25,7 @@ const ForgotPasswordFormComponent = () => {
     formState: { errors, isSubmitting },
   } = useForm<ForgotPwdDto>({
     resolver: zodResolver(ForgotPwdSchema),
-    mode: "onBlur", // feedback progressif sans être trop agressif
+    mode: "onBlur",
   });
 
   const onSubmit = async (data: FormData) => {
