@@ -9,7 +9,7 @@ const DashboardLayoutComponent = (props: DashboardLayoutProps) => {
   const { children, withNavigation = true } = props;
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
-      <Appbar withNavigation />
+      <Appbar withNavigation={withNavigation} />
 
       {withNavigation ? <DesktopAppDrawer /> : null}
 

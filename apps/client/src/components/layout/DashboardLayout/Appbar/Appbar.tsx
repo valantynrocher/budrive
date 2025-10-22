@@ -14,7 +14,7 @@ import MobileAppDrawer from "./MobileAppDrawer";
 import { AppbarProps } from "./props";
 
 const Appbar = (props: AppbarProps) => {
-  const { withNavigation } = props;
+  const { withNavigation = true } = props;
 
   const [open, setOpen] = useState(false);
   const { logout } = useSession();
@@ -58,7 +58,16 @@ const Appbar = (props: AppbarProps) => {
             pl: 2,
           }}
         >
-          <BudriveIcon sx={{ display: { xs: "none", md: "initial" } }} />
+          <BudriveIcon
+            sx={{
+              display: withNavigation
+                ? {
+                    xs: "none",
+                    md: "initial",
+                  }
+                : undefined,
+            }}
+          />
 
           {withNavigation ? (
             <MenuButton
