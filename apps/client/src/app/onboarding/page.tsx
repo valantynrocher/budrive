@@ -3,13 +3,7 @@ import Link from "next/link";
 
 const OnboardingPage = () => {
   return (
-    <Stack
-      direction="row"
-      justifyContent="center"
-      sx={{
-        height: "100%",
-      }}
-    >
+    <Stack direction="row" justifyContent="center">
       <Card
         sx={{
           width: 600,
