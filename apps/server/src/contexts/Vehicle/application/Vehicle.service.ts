@@ -4,7 +4,7 @@ import {
   VEHICLE_REPOSITORY,
   IVehicleRepository,
 } from "../domain/VehicleRepository.interface";
-import { type Step1VehicleDto, VehicleErrors } from "@budrive/validation";
+import { type OnboardingStep1Dto, VehicleErrors } from "@budrive/validation";
 
 @Injectable()
 export class VehicleService {
@@ -16,7 +16,10 @@ export class VehicleService {
   /**
    * Step 1 of Onboarding
    */
-  async createVehicle(userId: string, data: Step1VehicleDto): Promise<Vehicle> {
+  async createVehicle(
+    userId: string,
+    data: OnboardingStep1Dto,
+  ): Promise<Vehicle> {
     // 1. Logique métier : vérifier si l'utilisateur a déjà un véhicule (si vous limitez à un seul)
     const plateExists = await this.vehicleRepository.findByLicensePlate(
       data.licensePlate,

@@ -1,4 +1,4 @@
-import { type FuelType, type Step1VehicleDto } from "@budrive/validation";
+import { type FuelType, type OnboardingStep1Dto } from "@budrive/validation";
 
 /**
  * Propriétés brutes de l'entité Vehicle.
@@ -27,7 +27,7 @@ export class Vehicle {
   /**
    * Méthode Factory pour créer une nouvelle instance (lors de l'Onboarding).
    */
-  public static create(data: Step1VehicleDto, userId: string): Vehicle {
+  public static create(data: OnboardingStep1Dto, userId: string): Vehicle {
     const now = new Date();
     const initialProps: VehicleEntityProps = {
       id: "tempo",

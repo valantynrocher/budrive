@@ -4,7 +4,11 @@ import {
   IVehicleRepository,
   VEHICLE_REPOSITORY,
 } from "@/contexts/Vehicle/domain/VehicleRepository.interface";
-import { FuelType, Step1VehicleDto, VehicleErrors } from "@budrive/validation";
+import {
+  FuelType,
+  OnboardingStep1Dto,
+  VehicleErrors,
+} from "@budrive/validation";
 import { ConflictException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 
@@ -39,7 +43,7 @@ describe("VehicleService (Application Layer)", () => {
   });
 
   const mockUserId = "user-123";
-  const mockStep1Dto: Step1VehicleDto = {
+  const mockStep1Dto: OnboardingStep1Dto = {
     make: "Tesla",
     model: "Model 3",
     mileage: 5000,

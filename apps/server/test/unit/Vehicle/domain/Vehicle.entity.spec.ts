@@ -1,14 +1,14 @@
 import { Vehicle } from "@/contexts/Vehicle/domain/Vehicle.entity";
-import { Step1VehicleDto } from "@budrive/validation";
+import { FuelType, OnboardingStep1Dto } from "@budrive/validation";
 
 describe("Vehicle Entity (Domain rules)", () => {
   const mockUserId = "user-abc-123";
-  const mockStep1Dto: Step1VehicleDto = {
+  const mockStep1Dto: OnboardingStep1Dto = {
     make: "Peugeot",
     model: "207",
     mileage: 233459,
     yearOfCirculation: 2009,
-    fuelType: "GASOLINE",
+    fuelType: FuelType.GASOLINE,
     licensePlate: "AZ-542-CE",
   };
 

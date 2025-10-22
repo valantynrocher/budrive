@@ -3,13 +3,13 @@ import { OnboardingService } from "@/contexts/User/application/Onboarding.servic
 import { ZodValidationPipe } from "@/shared/infrastructure/common/zod/zod-validation.pipe";
 import {
   SuccessResponseDto,
-  type Step1VehicleDto,
-  Step1VehicleSchema,
+  type OnboardingStep1Dto,
+  OnboardingStep1Schema,
 } from "@budrive/validation";
 import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
 import { type Request } from "express";
 
-@UseGuards(JwtAuthGuard) // Tous les endpoints nécessitent une authentification
+@UseGuards(JwtAuthGuard)
 @Controller("onboarding")
 export class OnboardingController {
   constructor(private readonly onboardingService: OnboardingService) {}
@@ -36,7 +36,8 @@ export class OnboardingController {
   @Post("step-1")
   async postStep1(
     @Req() req: Request,
-    @Body(new ZodValidationPipe(Step1VehicleSchema)) step1Dto: Step1VehicleDto,
+    @Body(new ZodValidationPipe(OnboardingStep1Schema))
+    step1Dto: OnboardingStep1Dto,
   ): Promise<SuccessResponseDto> {
     const userId = req.user!.sub;
 

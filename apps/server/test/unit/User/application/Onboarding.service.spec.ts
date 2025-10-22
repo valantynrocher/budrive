@@ -2,7 +2,7 @@ import { OnboardingService } from "@/contexts/User/application/Onboarding.servic
 import { UserService } from "@/contexts/User/application/User.service";
 import { User } from "@/contexts/User/domain";
 import { VehicleService } from "@/contexts/Vehicle/application/Vehicle.service";
-import { AuthErrors, FuelType, Step1VehicleDto } from "@budrive/validation";
+import { AuthErrors, FuelType, OnboardingStep1Dto } from "@budrive/validation";
 import { BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { OnboardingStatus } from "@prisma/client";
@@ -45,7 +45,7 @@ describe("OnboardingService (Application Layer)", () => {
   };
 
   describe("completeStep1 method", () => {
-    const mockStep1Dto: Step1VehicleDto = {
+    const mockStep1Dto: OnboardingStep1Dto = {
       make: "Honda",
       model: "Civic",
       mileage: 10000,
