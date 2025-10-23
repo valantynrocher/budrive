@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import config from "@/lib/api/config";
 
 // BASED ON 85% OF JWT_EXPIRES_IN
-const REFRESH_CHECK_INTERVAL_MS = 3060;
+const REFRESH_CHECK_INTERVAL_MS = 3060000;
 
 const SessionProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
