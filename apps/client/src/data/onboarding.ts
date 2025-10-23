@@ -4,19 +4,19 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 1,
     title: "Identification du véhicule",
-    description: "Informations de base sur votre véhicule",
+    description: "Donnez-nous les informations de base sur votre véhicule",
     endpoint: "/onboarding/step-1",
   },
   {
     id: 2,
     title: "Votre véhicule et vous",
-    description: "Informations sur l'achat de votre véhicule",
+    description: "Dites nous tout sur l'achat de votre véhicule",
     endpoint: "/onboarding/step-2",
   },
   {
     id: 3,
     title: "Assurance",
-    description: "Configuration de votre assurance",
+    description: "Configurez votre contrat d'assurance",
     endpoint: "/onboarding/step-3",
   },
   {

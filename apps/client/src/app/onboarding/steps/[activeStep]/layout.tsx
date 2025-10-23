@@ -24,9 +24,9 @@ const StepsLayout = async ({ children, params }: StepsLayoutProps) => {
         alternativeLabel
         sx={{
           width: "80%",
-          position: "fixed",
-          left: "50%",
-          transform: "translate(-50%, 0)",
+          mx: "auto",
+          pb: 2,
+          backgroundColor: "background.paper",
         }}
       >
         {ONBOARDING_STEPS.map((stepData) => (
@@ -36,14 +36,21 @@ const StepsLayout = async ({ children, params }: StepsLayoutProps) => {
         ))}
       </Stepper>
 
-      <Stack justifyContent="space-between" flexGrow={1} marginTop={14}>
-        <Box>
-          <Typography variant="h4" textAlign="center" gutterBottom>
+      <Stack flexGrow={1}>
+        <Box mb={2}>
+          <Typography variant="h5" textAlign="center" gutterBottom>
             {activeStepObject.description}
           </Typography>
         </Box>
 
-        {children}
+        <Box
+          sx={{
+            width: "80%",
+            mx: "auto",
+          }}
+        >
+          {children}
+        </Box>
       </Stack>
     </Box>
   );

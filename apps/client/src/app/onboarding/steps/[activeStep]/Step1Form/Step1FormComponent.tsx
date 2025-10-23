@@ -1,8 +1,7 @@
 "use client";
-import { fuelOptions, yearsOptions, minYear } from "./fieldOptions";
+import ErrorSnackbar from "@/components/ui/ErrorSnackbar";
 import { getModelsByMake, makes } from "@/data/makes-models";
 import {
-  FuelType,
   type OnboardingStep1Dto,
   OnboardingStep1Schema,
 } from "@budrive/validation";
@@ -12,7 +11,6 @@ import {
   Button,
   FormControl,
   FormHelperText,
-  FormLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -20,29 +18,28 @@ import {
   TextField,
 } from "@mui/material";
 import Link from "next/link";
-import { useEffect } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { fuelOptions, yearsOptions } from "./fieldOptions";
 import step1ServerAction from "./step1ServerAction";
 
-const FRENCH_PLATE_REGEX =
-  /^(?:[A-Z]{2}-\d{3}-[A-Z]{2}|(?:\d{1,4}-[A-Z]{1,3}-\d{2}))$/i;
-
 const Step1FormComponent = () => {
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   const {
     control,
-    register,
     handleSubmit,
     setValue,
     getValues,
-    formState: { errors, isSubmitting },
-  } = useForm<OnboardingStep1Dto>({
+    formState: { errors, isSubmitted },
+  } = useForm({
     resolver: zodResolver(OnboardingStep1Schema),
     mode: "onBlur",
     defaultValues: {
       make: "",
       model: "",
       licensePlate: "",
-      mileage: 0,
+      mileage: 1,
       yearOfCirculation: "" as any,
       fuelType: "" as any,
     },
@@ -56,8 +53,6 @@ const Step1FormComponent = () => {
   const modelOptions = selectedMake ? getModelsByMake(selectedMake) : [];
 
   useEffect(() => {
-    // Si la marque change, ou si le modèle sélectionné n'est plus valide
-    // dans les nouvelles options, on réinitialise le modèle à vide.
     const currentModelValue = getValues("model"); // Accès direct à la valeur
     if (
       !selectedMake ||
@@ -67,8 +62,18 @@ const Step1FormComponent = () => {
     }
   }, [selectedMake, setValue, modelOptions, control]);
 
-  const onSubmit = async (data: FormData) => {
-    await step1ServerAction(data);
+  const onSubmit: SubmitHandler<OnboardingStep1Dto> = async (formData) => {
+    setFetchError(null);
+
+    const nextFetchError = await step1ServerAction(formData);
+
+    if (nextFetchError) {
+      setFetchError(nextFetchError);
+    }
+  };
+
+  const handleErrorClose = () => {
+    setFetchError(null);
   };
 
   return (
@@ -83,173 +88,148 @@ const Step1FormComponent = () => {
           gap: 2,
         }}
       >
-        <FormControl>
-          <FormLabel htmlFor="email">Nom</FormLabel>
-          <TextField
-            type="email"
-            {...register("name")}
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            color={Boolean(errors.name) ? "error" : "primary"}
-            //
-            variant="outlined"
-            autoComplete="name"
-            autoFocus
-            fullWidth
-            placeholder="Ma Peugeot"
+        <Stack spacing={2} direction="row">
+          <Controller
+            name="name"
+            control={control}
+            render={({ field, fieldState: { isDirty } }) => (
+              <TextField
+                {...field}
+                label="Nom"
+                variant="outlined"
+                fullWidth
+                error={(isDirty || isSubmitted) && !!errors.name}
+                helperText={
+                  (isDirty || isSubmitted) && errors.name
+                    ? errors.name.message
+                    : undefined
+                }
+                placeholder="Ma Peugeot"
+              />
+            )}
           />
-        </FormControl>
 
-        <Controller
-          name="make"
-          control={control}
-          rules={{ required: "La marque est obligatoire" }}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.make}>
-              <InputLabel id="make-label">Marque</InputLabel>
-              <Select
+          <Controller
+            name="licensePlate"
+            control={control}
+            render={({ field, fieldState: { isDirty } }) => (
+              <TextField
                 {...field}
-                labelId="make-label"
-                label="Marque"
-                value={field.value || ""}
-                displayEmpty
-              >
-                {makes.map((make) => (
-                  <MenuItem key={make} value={make}>
-                    {make}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.make && (
-                <FormHelperText>{errors.make.message}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-        />
+                label="Immatriculation"
+                variant="outlined"
+                fullWidth
+                error={(isDirty || isSubmitted) && !!errors.licensePlate}
+                helperText={
+                  (isDirty || isSubmitted) && errors.licensePlate
+                    ? errors.licensePlate.message
+                    : undefined
+                }
+                slotProps={{
+                  htmlInput: { style: { textTransform: "uppercase" } },
+                }}
+              />
+            )}
+          />
+        </Stack>
 
-        <Controller
-          name="model"
-          control={control}
-          // Validation conditionnelle : le modèle est requis SEULEMENT si une marque est sélectionnée
-          rules={{
-            required: selectedMake ? "Le modèle est obligatoire" : false,
-          }}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.model}>
-              <InputLabel id="model-label">
-                {!selectedMake ? "Sélectionnez d'abord une marque" : "Modèle"}
-              </InputLabel>
-              <Select
-                {...field}
-                labelId="model-label"
-                label="Modèle"
-                value={field.value || ""}
-                disabled={!selectedMake} // 👈 DÉSACTIVATION
-                displayEmpty
+        <Stack spacing={2} direction="row">
+          <Controller
+            name="make"
+            control={control}
+            render={({ field, fieldState: { isDirty } }) => (
+              <FormControl
+                fullWidth
+                error={(isDirty || isSubmitted) && !!errors.make}
               >
-                {modelOptions.map((model) => (
-                  <MenuItem key={model} value={model}>
-                    {model}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.model && (
-                <FormHelperText>{errors.model.message}</FormHelperText>
-              )}
-              {!selectedMake && (
-                <FormHelperText>
-                  Sélectionnez une marque pour activer les modèles.
-                </FormHelperText>
-              )}
-            </FormControl>
-          )}
-        />
+                <InputLabel id="make-label">Marque</InputLabel>
+                <Select {...field} displayEmpty>
+                  {makes.map((make) => (
+                    <MenuItem key={make} value={make}>
+                      {make}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {(isDirty || isSubmitted) && errors.make && (
+                  <FormHelperText>{errors.make.message}</FormHelperText>
+                )}
+              </FormControl>
+            )}
+          />
 
-        <Controller
-          name="licensePlate"
-          control={control}
-          rules={{
-            required: "L'immatriculation est obligatoire",
-            pattern: {
-              value: FRENCH_PLATE_REGEX,
-              message: "Le format doit être AA-123-BB ou 123-AA-12.",
-            },
-          }}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Immatriculation"
-              variant="outlined"
-              fullWidth
-              // MUI gère l'état d'erreur via les props error et helperText
-              error={!!errors.licensePlate}
-              helperText={
-                errors.licensePlate
-                  ? errors.licensePlate.message
-                  : "Ex: AA-123-BB ou 123-AB-45"
-              }
-              slotProps={{
-                htmlInput: { style: { textTransform: "uppercase" } },
-              }}
-            />
-          )}
-        />
-
-        <Controller
-          name="yearOfCirculation"
-          control={control}
-          rules={{ required: "L'année de mise en circulation est obligatoire" }}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.yearOfCirculation}>
-              <InputLabel id="year-label">Année de Circulation</InputLabel>
-              <Select
-                {...field}
-                labelId="year-label"
-                label="Année de Circulation"
-                value={field.value}
-                displayEmpty
+          <Controller
+            name="model"
+            control={control}
+            render={({ field, fieldState: { isDirty } }) => (
+              <FormControl
+                fullWidth
+                error={(isDirty || isSubmitted) && !!errors.model}
+                disabled={!selectedMake}
               >
-                {yearsOptions.map((year) => (
-                  <MenuItem key={year} value={year}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.yearOfCirculation && (
-                <FormHelperText>
-                  {errors.yearOfCirculation.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-          )}
-        />
+                <InputLabel id="model-label">Modèle</InputLabel>
+                <Select {...field} disabled={!selectedMake} displayEmpty>
+                  {modelOptions.map((model) => (
+                    <MenuItem key={model} value={model}>
+                      {model}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {(isDirty || isSubmitted) && errors.model && (
+                  <FormHelperText>{errors.model.message}</FormHelperText>
+                )}
+              </FormControl>
+            )}
+          />
+        </Stack>
 
-        <Controller
-          name="fuelType"
-          control={control}
-          rules={{ required: "Le type de carburant est obligatoire" }}
-          render={({ field }) => (
-            <FormControl fullWidth error={!!errors.fuelType}>
-              <InputLabel id="fuel-label">Type de Carburant</InputLabel>
-              <Select
-                {...field}
-                labelId="fuel-label"
-                label="Type de Carburant"
-                value={field.value}
-                displayEmpty
+        <Stack spacing={2} direction="row">
+          <Controller
+            name="yearOfCirculation"
+            control={control}
+            render={({ field, fieldState: { isDirty } }) => (
+              <FormControl
+                fullWidth
+                error={(isDirty || isSubmitted) && !!errors.yearOfCirculation}
               >
-                {fuelOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.fuelType && (
-                <FormHelperText>{errors.fuelType.message}</FormHelperText>
-              )}
-            </FormControl>
-          )}
-        />
+                <InputLabel id="year-label">Année de Circulation</InputLabel>
+                <Select {...field} displayEmpty>
+                  {yearsOptions.map((year) => (
+                    <MenuItem key={year} value={year}>
+                      {year}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {(isDirty || isSubmitted) && errors.yearOfCirculation && (
+                  <FormHelperText>
+                    {errors.yearOfCirculation.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            name="fuelType"
+            control={control}
+            render={({ field, fieldState: { isDirty } }) => (
+              <FormControl
+                fullWidth
+                error={(isDirty || isSubmitted) && !!errors.fuelType}
+              >
+                <InputLabel id="fuel-label">Type de Carburant</InputLabel>
+                <Select {...field} displayEmpty>
+                  {fuelOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {(isDirty || isSubmitted) && errors.fuelType && (
+                  <FormHelperText>{errors.fuelType.message}</FormHelperText>
+                )}
+              </FormControl>
+            )}
+          />
+        </Stack>
 
         <Stack
           spacing={2}
@@ -267,6 +247,8 @@ const Step1FormComponent = () => {
           </Button>
         </Stack>
       </Box>
+
+      <ErrorSnackbar message={fetchError} onClose={handleErrorClose} />
     </>
   );
 };

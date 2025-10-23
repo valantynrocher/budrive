@@ -15,7 +15,7 @@ const page = async ({
 
   const MatchedComponent = stepViewMatcher[activeStep];
 
-  return MatchedComponent || null;
+  return MatchedComponent ? <MatchedComponent /> : null;
 };
 
 export default page;
