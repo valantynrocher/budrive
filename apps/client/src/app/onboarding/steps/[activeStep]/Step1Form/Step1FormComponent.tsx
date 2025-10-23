@@ -1,3 +1,4 @@
+"use client";
 import { fuelOptions, yearsOptions, minYear } from "./fieldOptions";
 import { getModelsByMake, makes } from "@/data/makes-models";
 import {

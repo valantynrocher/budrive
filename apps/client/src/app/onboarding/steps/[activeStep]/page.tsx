@@ -1,4 +1,4 @@
-import Step1 from "@/app/onboarding/steps/[activeStep]/step1";
+import Step1Form from "@/app/onboarding/steps/[activeStep]/Step1Form";
 import React from "react";
 
 const page = async ({
@@ -9,13 +9,13 @@ const page = async ({
   await params;
   const activeStep = parseInt((await params).activeStep);
 
-  const stepComponentMatcher: { [key: number]: React.ComponentType<any> } = {
-    1: Step1,
+  const stepViewMatcher: { [key: number]: React.FC<any> } = {
+    1: Step1Form,
   };
 
-  const MatchedComponent = stepComponentMatcher[activeStep];
+  const MatchedComponent = stepViewMatcher[activeStep];
 
-  return MatchedComponent ? <MatchedComponent /> : null;
+  return MatchedComponent || null;
 };
 
 export default page;

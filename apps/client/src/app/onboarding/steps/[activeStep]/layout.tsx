@@ -1,12 +1,15 @@
 import { ONBOARDING_STEPS } from "@/data/onboarding";
-import { Stack, Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
+import Typography from "@mui/material/Typography";
 import { StepsLayoutProps } from "./props";
 
 const StepsLayout = async ({ children, params }: StepsLayoutProps) => {
-  const activeStep = parseInt((await params).activeStep) - 1;
+  const activeStep = parseInt((await params).activeStep);
+  const activeStepIndex = activeStep - 1;
+  const activeStepObject = ONBOARDING_STEPS[activeStepIndex];
 
   return (
     <Box
@@ -17,7 +20,7 @@ const StepsLayout = async ({ children, params }: StepsLayoutProps) => {
       }}
     >
       <Stepper
-        activeStep={activeStep}
+        activeStep={activeStepIndex}
         alternativeLabel
         sx={{
           width: "80%",
@@ -34,6 +37,12 @@ const StepsLayout = async ({ children, params }: StepsLayoutProps) => {
       </Stepper>
 
       <Stack justifyContent="space-between" flexGrow={1} marginTop={14}>
+        <Box>
+          <Typography variant="h4" textAlign="center" gutterBottom>
+            {activeStepObject.description}
+          </Typography>
+        </Box>
+
         {children}
       </Stack>
     </Box>

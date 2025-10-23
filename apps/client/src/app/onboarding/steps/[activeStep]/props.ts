@@ -1,4 +1,4 @@
-import { WithRouteParamsProps, LayoutProps } from "@/utils/types/props";
+import { LayoutProps, WithRouteParamsProps } from "@/utils/types/props";
 
 export type StepParamsProps = WithRouteParamsProps<{ activeStep: string }>;
 
