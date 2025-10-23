@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VehicleErrors } from "./messages";
 
 export enum FuelType {
   GASOLINE = "GASOLINE",
@@ -8,4 +9,6 @@ export enum FuelType {
   OTHER = "OTHER",
 }
 
-export const FuelTypeSchema = z.nativeEnum(FuelType);
+export const FuelTypeSchema = z.nativeEnum(FuelType, {
+  message: VehicleErrors.FUEL_TYPE_UNKNOW,
+});
