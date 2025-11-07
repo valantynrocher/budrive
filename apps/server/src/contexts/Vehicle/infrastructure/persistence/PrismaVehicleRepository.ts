@@ -25,6 +25,10 @@ export class PrismaVehicleRepository implements IVehicleRepository {
       fuelType: prismaVehicle.fuelType as FuelType,
       createdAt: prismaVehicle.createdAt,
       updatedAt: prismaVehicle.updatedAt,
+      estimatedAnnualMileage: prismaVehicle.estimatedAnnualMileage,
+      initialMileage: prismaVehicle.initialMileage,
+      purchaseDate: prismaVehicle.purchaseDate,
+      purchasePrice: prismaVehicle.purchasePrice,
     };
     return Vehicle.fromPersistence(domainProps);
   }
@@ -43,6 +47,14 @@ export class PrismaVehicleRepository implements IVehicleRepository {
     });
 
     return this.toDomain(prismaVehicle);
+  }
+
+  async findById(id: string): Promise<Vehicle | null> {
+    const prismaVehicle = await this.prisma.vehicle.findUnique({
+      where: { id },
+    });
+
+    return prismaVehicle ? this.toDomain(prismaVehicle) : null;
   }
 
   async findByUserId(userId: string): Promise<Vehicle[]> {

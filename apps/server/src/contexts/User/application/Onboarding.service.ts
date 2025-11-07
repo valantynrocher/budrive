@@ -1,6 +1,11 @@
 import { UserService } from "@/contexts/User/application/User.service";
 import { VehicleService } from "@/contexts/Vehicle/application/Vehicle.service";
-import { AuthErrors } from "@budrive/validation";
+import { Vehicle } from "@/contexts/Vehicle/domain/Vehicle.entity";
+import {
+  AuthErrors,
+  OnboardingStep1Dto,
+  OnboardingStep2Dto,
+} from "@budrive/validation";
 import {
   BadRequestException,
   Injectable,
@@ -15,7 +20,6 @@ export class OnboardingService {
   ) {}
 
   private async checkUser(userId: string) {
-    // Récupération de l'utilisateur pour vérification
     const user = await this.userService.findUserById(userId);
 
     if (!user) {
@@ -38,17 +42,35 @@ export class OnboardingService {
 
   async completeStep1(
     userId: string,
-    step1Dto: any, // TODO
-  ): Promise<void> {
+    step1Dto: OnboardingStep1Dto,
+  ): Promise<Vehicle> {
     const user = await this.checkUser(userId);
 
-    // Création du véhicule
-    await this.vehicleService.createVehicle(userId, step1Dto);
+    const vehicle = await this.vehicleService.createVehicle(userId, step1Dto);
 
-    // Mise à jour de l'état de l'utilisateur
     user.updateOnboardingStep(2);
 
-    // Sauvegarde de l'état mis à jour
     await this.userService.save(user);
+
+    return vehicle;
+  }
+
+  async completeStep2(
+    userId: string,
+    vehicleId: string,
+    step2Dto: OnboardingStep2Dto,
+  ): Promise<Vehicle> {
+    const user = await this.checkUser(userId);
+
+    const vehicle = await this.vehicleService.recordAcquisitionData(
+      vehicleId,
+      step2Dto,
+    );
+
+    user.updateOnboardingStep(3);
+
+    await this.userService.save(user);
+
+    return vehicle;
   }
 }

@@ -10,14 +10,20 @@ export interface IVehicleRepository {
   save(vehicle: Vehicle): Promise<Vehicle>;
 
   /**
+   * Récupère un Véhicule par son identifiant unique.
+   * @param id L'identifiant du véhicule.
+   */
+  findById(id: string): Promise<Vehicle | null>;
+
+  /**
    * Récupère la liste des véhicules d'un utilisateur.
    * @param userId L'identifiant de l'utilisateur.
    */
   findByUserId(userId: string): Promise<Vehicle[]>;
 
   /**
-   * Récupère un Vehicle par son identifiant unique.
-   * @param id L'identifiant du véhicule.
+   * Récupère un Vehicle par son immatriculation.
+   * @param licensePlate L'immatriculation du véhicule.
    */
   findByLicensePlate(licensePlate: string): Promise<Vehicle | null>;
 }

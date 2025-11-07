@@ -75,6 +75,12 @@ model Vehicle {
   yearOfCirculation   Int
   fuelType            FuelType
 
+  // DONNÉES D'AQUISITION
+  purchaseDate            DateTime? @map("purchase_date")
+  purchasePrice           Float?    @map("purchase_price") // Utilisez Float ou Decimal
+  initialMileage          Int?      @map("initial_mileage")
+  estimatedAnnualMileage  Int?      @map("estimated_annual_mileage")
+
   // METADONNÉES
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

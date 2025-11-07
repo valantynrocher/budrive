@@ -1,10 +1,19 @@
-import { Injectable, Inject, ConflictException } from "@nestjs/common";
+import {
+  Injectable,
+  Inject,
+  ConflictException,
+  NotFoundException,
+} from "@nestjs/common";
 import { Vehicle } from "../domain/Vehicle.entity";
 import {
   VEHICLE_REPOSITORY,
   IVehicleRepository,
 } from "../domain/VehicleRepository.interface";
-import { type OnboardingStep1Dto, VehicleErrors } from "@budrive/validation";
+import {
+  type OnboardingStep1Dto,
+  OnboardingStep2Dto,
+  VehicleErrors,
+} from "@budrive/validation";
 
 @Injectable()
 export class VehicleService {
@@ -35,5 +44,25 @@ export class VehicleService {
     const savedVehicle = await this.vehicleRepository.save(newVehicle);
 
     return savedVehicle;
+  }
+
+  async recordAcquisitionData(
+    vehicleId: string,
+    data: OnboardingStep2Dto,
+  ): Promise<Vehicle> {
+    const vehicle = await this.vehicleRepository.findById(vehicleId);
+
+    if (!vehicle) {
+      throw new NotFoundException(
+        `Véhicule avec l'ID ${vehicleId} non trouvé.`,
+      );
+    }
+
+    vehicle.recordAcquisitionData(data);
+
+    // 3. Persister l'Entité dans la base de données (Supabase)
+    const updatedVehicle = await this.vehicleRepository.save(vehicle);
+
+    return updatedVehicle;
   }
 }

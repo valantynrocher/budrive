@@ -1,4 +1,8 @@
-import { type FuelType, type OnboardingStep1Dto } from "@budrive/validation";
+import {
+  type OnboardingStep2Dto,
+  type FuelType,
+  type OnboardingStep1Dto,
+} from "@budrive/validation";
 
 /**
  * Propriétés brutes de l'entité Vehicle.
@@ -12,6 +16,10 @@ export interface VehicleEntityProps {
   licensePlate: string;
   yearOfCirculation: number;
   fuelType: FuelType;
+  purchaseDate: Date | null;
+  purchasePrice: number | null;
+  initialMileage: number | null;
+  estimatedAnnualMileage: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,10 +46,21 @@ export class Vehicle {
       licensePlate: data.licensePlate,
       yearOfCirculation: data.yearOfCirculation,
       fuelType: data.fuelType,
+      estimatedAnnualMileage: null,
+      initialMileage: null,
+      purchaseDate: null,
+      purchasePrice: null,
       createdAt: now,
       updatedAt: now,
     };
     return new Vehicle(initialProps);
+  }
+
+  public recordAcquisitionData(data: OnboardingStep2Dto): void {
+    this.props.estimatedAnnualMileage = data.estimatedAnnualMileage;
+    this.props.purchaseDate = data.purchaseDate;
+    this.props.initialMileage = data.initialMileage;
+    this.props.purchasePrice = data.purchasePrice;
   }
 
   /**
@@ -67,7 +86,7 @@ export class Vehicle {
   public getMileage(): number {
     return this.props.mileage;
   }
-  public getLicensePlate(): string | undefined {
+  public getLicensePlate(): string {
     return this.props.licensePlate;
   }
   public getYearOfCirculation(): number {
@@ -81,6 +100,18 @@ export class Vehicle {
   }
   public getUpdatedAd(): Date {
     return this.props.updatedAt;
+  }
+  public getEstimatedAnnualMileage(): number | null {
+    return this.props.estimatedAnnualMileage;
+  }
+  public getPurchaseDate(): Date | null {
+    return this.props.purchaseDate;
+  }
+  public getInitialMileage(): number | null {
+    return this.props.initialMileage;
+  }
+  public getPurchasePrice(): number | null {
+    return this.props.purchasePrice;
   }
 
   // Renvoie toutes les propriétés pour la persistance ou les DTOs
