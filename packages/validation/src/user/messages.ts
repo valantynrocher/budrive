@@ -8,5 +8,7 @@ export const OnboardingErrors = {
     "L'année doit être comprise entre 2005 et l'année en cours",
   STEP_UNKNOW_ERROR:
     "L'enregistrement a échoué. Veuillez réessayer ultérieurement",
+  PURCHASE_DATE_INVALID:
+    "La date d'achat doit être comprise entre le 01/01/2005 et la date du jour",
 } as const;
 export type OnboardingErrorKey = keyof typeof OnboardingErrors;
